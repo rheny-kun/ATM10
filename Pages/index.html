@@ -117,6 +117,72 @@
         font-size: 14px;
       }
 
+      .site-nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 16px;
+        flex-wrap: wrap;
+        position: relative;
+      }
+
+      .site-nav-toggle {
+        display: none;
+        min-width: 44px;
+        min-height: 44px;
+        align-items: center;
+        justify-content: center;
+        color: var(--text);
+        background: rgba(16, 25, 36, 0.8);
+        border: 1px solid var(--border-strong);
+        border-radius: 10px;
+        font-size: 22px;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .site-nav-toggle:hover,
+      .site-nav-toggle:focus-visible,
+      .site-nav a {
+        color: var(--link);
+      }
+
+      .site-nav-toggle:hover,
+      .site-nav-toggle:focus-visible {
+        border: 1px solid var(--border-strong);
+        background: var(--panel-hover);
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      .site-nav-links {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .site-nav a {
+        border: 1px solid var(--border-strong);
+        border-radius: 999px;
+        padding: 6px 12px;
+        text-decoration: none;
+        background: rgba(16, 25, 36, 0.8);
+      }
+
+      .site-nav a:hover,
+      .site-nav a:focus-visible {
+        background: var(--panel-hover);
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      .site-nav a[aria-current="page"] {
+        color: #07110c;
+        background: var(--accent);
+        border-color: var(--accent);
+        font-weight: 700;
+      }
+
       /* ---------- Filters ---------- */
 
       .filter-bar {
@@ -321,7 +387,8 @@
           0 5px 15px rgba(0, 0, 0, 0.18);
       }
 
-      .icon-frame img {
+      .icon-frame img,
+      .icon-frame canvas {
         display: block;
 
         width: 48px;
@@ -336,10 +403,18 @@
         image-rendering: crisp-edges;
       }
 
-      /*
-  GIFはブラウザ標準の<img>でそのままアニメーションする。
-  object-fit: contain にしてフレームをクロップしない。
-*/
+      .icon-frame canvas {
+        object-fit: contain;
+      }
+
+      .icon-frame img[hidden],
+      .icon-frame canvas[hidden] {
+        display: none;
+      }
+
+      .icon-frame img.pending-image {
+        visibility: hidden;
+      }
 
       .icon-fallback {
         display: none;
@@ -482,6 +557,37 @@
         }
       }
 
+      @media (max-width: 700px) {
+        .site-nav {
+          display: block;
+        }
+
+        .has-nav-js .site-nav-toggle {
+          display: inline-flex;
+        }
+
+        .has-nav-js .site-nav-links {
+          display: none;
+          flex-direction: column;
+          gap: 4px;
+          margin-top: 8px;
+          padding: 8px;
+          border: 1px solid var(--border-strong);
+          border-radius: 10px;
+          background: var(--header);
+          box-shadow: var(--shadow);
+        }
+
+        .has-nav-js .site-nav-links.is-open {
+          display: flex;
+        }
+
+        .site-nav-links a {
+          border-radius: 7px;
+          padding: 9px 11px;
+        }
+      }
+
       @media (max-width: 520px) {
         .filters {
           grid-template-columns: 1fr;
@@ -502,6 +608,21 @@
           All the Mods 10 8.2 / Minecraft 1.21.1 / NeoForge — Relics &amp;
           Reliquified Artifacts 日本語まとめ
         </p>
+        <nav class="site-nav" aria-label="サイト内ナビゲーション">
+          <button
+            class="site-nav-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="site-nav-links"
+            aria-label="メニューを開く"
+          >
+            <span aria-hidden="true">☰</span>
+          </button>
+          <div class="site-nav-links" id="site-nav-links">
+            <a href="./index.html" aria-current="page">Relics / Artifacts</a>
+            <a href="./enchantments.html">Enchantments</a>
+          </div>
+        </nav>
       </div>
     </header>
 
@@ -1587,45 +1708,434 @@
         return URLS.relicDocs + encodeURIComponent(item.id) + "/";
       }
 
-      /*
-       * GIF対応
-       *
-       * 1. <img>自体はGIFをネイティブ再生する。
-       * 2. まず .gif を試す。
-       * 3. 存在しなければ onerror で .png へフォールバック。
-       *
-       * PNGしか存在しない通常アイテムもそのまま表示可能。
-       */
+      const IMAGE_ID_ALIASES = {
+        Artifacts: {
+          umbrella: "umbrella_held",
+        },
+        Relics: {
+          clot_of_time: "clot_of_time_enabled",
+          midnight_mantle: "midnight_mantle_full_moon",
+          rider_flute: "rider_flute_empty",
+          sphere_of_self_sacrifice: "sphere_of_self_sacrifice_0",
+        },
+      };
+
       function imageCandidates(item) {
         const base =
           item.mod === "Artifacts" ? URLS.artifactImages : URLS.relicImages;
+        const imageId = IMAGE_ID_ALIASES[item.mod]?.[item.id] ?? item.id;
 
-        return [base + item.id + ".gif", base + item.id + ".png"];
+        return {
+          gif: base + imageId + ".gif",
+          png: base + imageId + ".png",
+          mcmeta: base + imageId + ".png.mcmeta",
+        };
       }
 
-      function installImageFallback(img, urls) {
-        let index = 0;
+      const imageLoadCache = new Map();
 
-        const tryNext = () => {
-          if (index >= urls.length) {
-            img.style.display = "none";
+      const animationMetaCache = new Map();
 
-            const fallback = img.parentElement.querySelector(".icon-fallback");
+      const activeAnimations = new Set();
 
-            if (fallback) {
-              fallback.style.display = "block";
+      const animationControllers = new Map();
+
+      let imageObserver = null;
+
+      let animationObserver = null;
+
+      let renderVersion = 0;
+
+      function loadImage(url) {
+        if (!imageLoadCache.has(url)) {
+          imageLoadCache.set(
+            url,
+            new Promise((resolve, reject) => {
+              const image = new Image();
+
+              image.decoding = "async";
+
+              image.onload = () => resolve(image);
+
+              image.onerror = () => reject(new Error(`画像を読み込めません: ${url}`));
+
+              image.src = url;
+            }),
+          );
+        }
+
+        return imageLoadCache.get(url);
+      }
+
+      function loadAnimationMeta(url) {
+        if (!animationMetaCache.has(url)) {
+          animationMetaCache.set(
+            url,
+            fetch(url, { mode: "cors" })
+              .then((response) => {
+                if (!response.ok) {
+                  throw new Error(`mcmetaを読み込めません: ${response.status}`);
+                }
+
+                return response.json();
+              })
+              .catch(() => null),
+          );
+        }
+
+        return animationMetaCache.get(url);
+      }
+
+      function isCurrentImage(img, version) {
+        return version === renderVersion && img.isConnected;
+      }
+
+      function showFallback(img) {
+        const frame = img.closest(".icon-frame");
+        const canvas = frame?.querySelector(".item-canvas");
+        const fallback = frame?.querySelector(".icon-fallback");
+
+        img.classList.remove("pending-image");
+
+        img.hidden = true;
+
+        if (canvas) {
+          canvas.hidden = true;
+        }
+
+        if (fallback) {
+          fallback.style.display = "block";
+        }
+      }
+
+      function showStaticImage(img, url) {
+        const frame = img.closest(".icon-frame");
+        const canvas = frame?.querySelector(".item-canvas");
+        const fallback = frame?.querySelector(".icon-fallback");
+
+        img.classList.remove("pending-image");
+
+        img.src = url;
+
+        img.hidden = false;
+
+        if (canvas) {
+          canvas.hidden = true;
+        }
+
+        if (fallback) {
+          fallback.style.display = "none";
+        }
+      }
+
+      function parseAnimationMeta(meta, frameCount) {
+        const animation = meta?.animation;
+
+        if (!animation || frameCount < 2) {
+          return null;
+        }
+
+        const defaultTime =
+          Number.isFinite(animation.frametime) && animation.frametime > 0
+            ? animation.frametime
+            : 1;
+
+        const sourceFrames =
+          Array.isArray(animation.frames) && animation.frames.length
+            ? animation.frames
+            : Array.from({ length: frameCount }, (_, index) => index);
+
+        const frames = sourceFrames
+          .map((entry) => {
+            const isObject = entry && typeof entry === "object";
+            const index = isObject ? entry.index : entry;
+            const time =
+              isObject && Number.isFinite(entry.time) && entry.time > 0
+                ? entry.time
+                : defaultTime;
+
+            return {
+              index,
+              time,
+            };
+          })
+          .filter(
+            (frame) =>
+              Number.isInteger(frame.index) &&
+              frame.index >= 0 &&
+              frame.index < frameCount,
+          );
+
+        return frames.length
+          ? {
+              frames,
+              // 補間はピクセルアートをぼかさないため非補間で再生する。
+              interpolate: Boolean(animation.interpolate),
             }
+          : null;
+      }
 
+      function stopAnimation(controller) {
+        controller.stopped = true;
+
+        if (controller.timer) {
+          window.clearTimeout(controller.timer);
+        }
+
+        animationControllers.delete(controller.canvas);
+
+        animationObserver?.unobserve(controller.canvas);
+
+        activeAnimations.delete(controller);
+      }
+
+      function stopAllAnimations() {
+        for (const controller of activeAnimations) {
+          stopAnimation(controller);
+        }
+
+        activeAnimations.clear();
+
+        animationControllers.clear();
+
+        imageObserver?.disconnect();
+
+        animationObserver?.disconnect();
+
+        imageObserver = null;
+
+        animationObserver = null;
+      }
+
+      function startAnimation(img, canvas, source, animation, version) {
+        const context = canvas.getContext("2d");
+
+        if (!context) {
+          return false;
+        }
+
+        const frameSize = source.naturalWidth;
+
+        canvas.width = frameSize;
+
+        canvas.height = frameSize;
+
+        context.imageSmoothingEnabled = false;
+
+        const controller = {
+          canvas,
+          index: 0,
+          timer: 0,
+          stopped: false,
+          visible: !animationObserver,
+          redraw: null,
+          refresh: null,
+        };
+
+        const draw = () => {
+          if (
+            controller.stopped ||
+            !isCurrentImage(img, version) ||
+            !controller.visible ||
+            document.visibilityState === "hidden"
+          ) {
             return;
           }
 
-          img.src = urls[index++];
+          const frame = animation.frames[controller.index];
+
+          context.clearRect(0, 0, frameSize, frameSize);
+
+          context.drawImage(
+            source,
+            0,
+            frame.index * frameSize,
+            frameSize,
+            frameSize,
+            0,
+            0,
+            frameSize,
+            frameSize,
+          );
         };
 
-        img.addEventListener("error", tryNext);
+        const schedule = () => {
+          if (
+            controller.stopped ||
+            !controller.visible ||
+            document.visibilityState === "hidden"
+          ) {
+            return;
+          }
 
-        tryNext();
+          const frame = animation.frames[controller.index];
+
+          controller.timer = window.setTimeout(() => {
+            controller.index =
+              (controller.index + 1) % animation.frames.length;
+
+            draw();
+
+            schedule();
+          }, frame.time * 50);
+        };
+
+        controller.redraw = () => {
+          draw();
+          schedule();
+        };
+
+        controller.refresh = (visible) => {
+          controller.visible = visible;
+
+          if (controller.timer) {
+            window.clearTimeout(controller.timer);
+
+            controller.timer = 0;
+          }
+
+          if (visible) {
+            controller.redraw();
+          }
+        };
+
+        activeAnimations.add(controller);
+
+        animationControllers.set(canvas, controller);
+
+        if (animationObserver) {
+          animationObserver.observe(canvas);
+        } else {
+          controller.redraw();
+        }
+
+        return true;
       }
+
+      async function mountImage(img, item, version) {
+        const candidates = imageCandidates(item);
+
+        let gif;
+
+        try {
+          gif = await loadImage(candidates.gif);
+        } catch {
+          gif = null;
+        }
+
+        if (!isCurrentImage(img, version)) {
+          return;
+        }
+
+        if (gif) {
+          showStaticImage(img, candidates.gif);
+
+          return;
+        }
+
+        let png;
+
+        try {
+          png = await loadImage(candidates.png);
+        } catch {
+          png = null;
+        }
+
+        if (!isCurrentImage(img, version)) {
+          return;
+        }
+
+        if (!png) {
+          showFallback(img);
+
+          return;
+        }
+
+        const frameCount = Math.floor(png.naturalHeight / png.naturalWidth);
+
+        let meta = null;
+
+        if (frameCount > 1) {
+          meta = await loadAnimationMeta(candidates.mcmeta);
+        }
+
+        if (!isCurrentImage(img, version)) {
+          return;
+        }
+
+        const animation = parseAnimationMeta(meta, frameCount);
+
+        if (!animation) {
+          showStaticImage(img, candidates.png);
+
+          return;
+        }
+
+        const canvas = img.closest(".icon-frame")?.querySelector(".item-canvas");
+
+        if (!canvas) {
+          showStaticImage(img, candidates.png);
+
+          return;
+        }
+
+        img.hidden = true;
+
+        canvas.hidden = false;
+
+        const fallback = img.closest(".icon-frame")?.querySelector(".icon-fallback");
+
+        if (fallback) {
+          fallback.style.display = "none";
+        }
+
+        if (!startAnimation(img, canvas, png, animation, version)) {
+          showStaticImage(img, candidates.png);
+        }
+      }
+
+      function observeRenderedImages(images, renderedItems, version) {
+        if ("IntersectionObserver" in window) {
+          animationObserver = new IntersectionObserver((entries) => {
+            for (const entry of entries) {
+              animationControllers.get(entry.target)?.refresh(entry.isIntersecting);
+            }
+          });
+
+          imageObserver = new IntersectionObserver(
+            (entries) => {
+              for (const entry of entries) {
+                if (!entry.isIntersecting) {
+                  continue;
+                }
+
+                imageObserver?.unobserve(entry.target);
+
+                const index = images.indexOf(entry.target);
+
+                if (index >= 0) {
+                  void mountImage(entry.target, renderedItems[index], version);
+                }
+              }
+            },
+            { rootMargin: "160px" },
+          );
+
+          images.forEach((img) => imageObserver.observe(img));
+
+          return;
+        }
+
+        images.forEach((img, index) => {
+          void mountImage(img, renderedItems[index], version);
+        });
+      }
+
+      document.addEventListener("visibilitychange", () => {
+        for (const controller of activeAnimations) {
+          controller.refresh(document.visibilityState === "visible");
+        }
+      });
 
       function modTag(mod) {
         const className = mod === "Artifacts" ? "tag-artifacts" : "tag-relics";
@@ -1674,9 +2184,7 @@
           .toLowerCase();
       }
 
-      function rowHtml(item, index) {
-        const urls = imageCandidates(item);
-
+      function rowHtml(item) {
         return `
     <tr>
       <td>
@@ -1684,12 +2192,18 @@
 
           <div class="icon-frame">
             <img
-              class="item-image"
-              data-image-index="${index}"
+              class="item-image pending-image"
               alt="${escapeHtml(item.name)}"
+              aria-label="${escapeHtml(item.name)}"
               loading="lazy"
               decoding="async"
             >
+            <canvas
+              class="item-canvas"
+              aria-label="${escapeHtml(item.name)}"
+              role="img"
+              hidden
+            ></canvas>
             <span class="icon-fallback">
               NO<br>IMG
             </span>
@@ -1760,7 +2274,7 @@
         });
 
         let html = "";
-        let imageIndex = 0;
+        const renderedItems = [];
 
         for (const slot of slotOrder) {
           const slotItems = filtered.filter((item) => item.slot === slot);
@@ -1772,7 +2286,9 @@
           const rows = [];
 
           for (const item of slotItems) {
-            rows.push(rowHtml(item, imageIndex++));
+            rows.push(rowHtml(item));
+
+            renderedItems.push(item);
           }
 
           html += `
@@ -1825,28 +2341,15 @@
 
         content.innerHTML = html;
 
-        /*
-         * HTML挿入後に画像フォールバックを設定。
-         * GIFが存在すればGIF、
-         * なければPNGへ自動的に切り替える。
-         */
-        let installedIndex = 0;
+        renderVersion += 1;
 
-        for (const slot of slotOrder) {
-          const slotItems = filtered.filter((item) => item.slot === slot);
+        stopAllAnimations();
 
-          for (const item of slotItems) {
-            const img = content.querySelector(
-              `[data-image-index="${installedIndex}"]`,
-            );
+        const version = renderVersion;
 
-            if (img) {
-              installImageFallback(img, imageCandidates(item));
-            }
+        const images = Array.from(content.querySelectorAll(".item-image"));
 
-            installedIndex++;
-          }
-        }
+        observeRenderedImages(images, renderedItems, version);
       }
 
       /* =========================================================
@@ -1870,6 +2373,43 @@
       modFilter.addEventListener("change", render);
 
       render();
+    </script>
+    <script>
+      (() => {
+        document.documentElement.classList.add("has-nav-js");
+
+        const nav = document.querySelector(".site-nav");
+        const toggle = nav?.querySelector(".site-nav-toggle");
+        const links = nav?.querySelector(".site-nav-links");
+
+        if (!nav || !toggle || !links) return;
+
+        const setOpen = (open) => {
+          toggle.setAttribute("aria-expanded", String(open));
+          toggle.setAttribute(
+            "aria-label",
+            open ? "メニューを閉じる" : "メニューを開く",
+          );
+          links.classList.toggle("is-open", open);
+        };
+
+        setOpen(false);
+        toggle.addEventListener("click", () => {
+          setOpen(toggle.getAttribute("aria-expanded") !== "true");
+        });
+        links.querySelectorAll("a").forEach((link) => {
+          link.addEventListener("click", () => setOpen(false));
+        });
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") setOpen(false);
+        });
+        document.addEventListener("click", (event) => {
+          if (!nav.contains(event.target)) setOpen(false);
+        });
+
+        const media = window.matchMedia("(min-width: 701px)");
+        media.addEventListener?.("change", () => setOpen(false));
+      })();
     </script>
   </body>
 </html>
