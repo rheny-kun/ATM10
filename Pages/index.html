@@ -1,0 +1,1875 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>ATM10 Relics / Artifacts 早見表</title>
+
+    <style>
+      :root {
+        --bg: #090c12;
+        --bg-soft: #0d121a;
+        --panel: rgba(18, 24, 34, 0.88);
+        --panel-hover: rgba(25, 33, 46, 0.96);
+        --header: #141b26;
+        --border: rgba(148, 163, 184, 0.14);
+        --border-strong: rgba(148, 163, 184, 0.24);
+
+        --text: #e8edf5;
+        --muted: #8e9aaa;
+        --link: #9ac7ff;
+
+        --artifact: #f0c46b;
+        --artifact-bg: rgba(240, 196, 107, 0.09);
+        --artifact-border: rgba(240, 196, 107, 0.28);
+
+        --relic: #cda6ff;
+        --relic-bg: rgba(205, 166, 255, 0.09);
+        --relic-border: rgba(205, 166, 255, 0.28);
+
+        --rank: #bca7ff;
+        --accent: #6ee7a8;
+
+        --radius: 14px;
+        --shadow:
+          0 12px 36px rgba(0, 0, 0, 0.22),
+          inset 0 1px 0 rgba(255, 255, 255, 0.025);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        background: var(--bg);
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--text);
+        background:
+          radial-gradient(
+            circle at 15% -10%,
+            rgba(80, 130, 210, 0.12),
+            transparent 35rem
+          ),
+          radial-gradient(
+            circle at 95% 0%,
+            rgba(100, 230, 170, 0.07),
+            transparent 30rem
+          ),
+          var(--bg);
+
+        font-family:
+          Inter,
+          "Noto Sans JP",
+          "Hiragino Sans",
+          "Yu Gothic UI",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+
+        line-height: 1.65;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      /* ---------- Header ---------- */
+
+      .site-header {
+        padding: 42px 24px 31px;
+        border-bottom: 1px solid var(--border);
+        background: linear-gradient(
+          180deg,
+          rgba(18, 28, 42, 0.82),
+          rgba(9, 12, 18, 0.22)
+        );
+      }
+
+      .container {
+        width: min(1480px, calc(100% - 32px));
+        margin-inline: auto;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(27px, 4vw, 42px);
+        line-height: 1.18;
+        letter-spacing: -0.035em;
+        font-weight: 760;
+
+        background: linear-gradient(105deg, #f5f8fc 10%, #b9d9ff 58%, #8ef0b8);
+
+        color: transparent;
+        background-clip: text;
+        -webkit-background-clip: text;
+      }
+
+      .subtitle {
+        margin: 9px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      /* ---------- Filters ---------- */
+
+      .filter-bar {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+
+        padding: 11px 0;
+
+        border-bottom: 1px solid var(--border);
+        background: rgba(9, 12, 18, 0.82);
+        backdrop-filter: blur(16px) saturate(140%);
+        -webkit-backdrop-filter: blur(16px) saturate(140%);
+      }
+
+      .filters {
+        display: grid;
+        grid-template-columns:
+          minmax(260px, 1fr)
+          minmax(180px, 235px)
+          minmax(160px, 210px);
+
+        gap: 10px;
+      }
+
+      .control {
+        width: 100%;
+        min-width: 0;
+
+        color: var(--text);
+        background: rgba(17, 23, 33, 0.92);
+
+        border: 1px solid var(--border-strong);
+        border-radius: 10px;
+
+        padding: 10px 12px;
+
+        font: inherit;
+        font-size: 13px;
+
+        outline: none;
+
+        transition:
+          border-color 0.15s ease,
+          background 0.15s ease,
+          box-shadow 0.15s ease;
+      }
+
+      .control:hover {
+        background: rgba(23, 31, 43, 0.96);
+      }
+
+      .control:focus {
+        border-color: rgba(119, 182, 255, 0.62);
+        box-shadow: 0 0 0 3px rgba(94, 164, 255, 0.1);
+      }
+
+      .control::placeholder {
+        color: #657183;
+      }
+
+      /* ---------- Main ---------- */
+
+      main {
+        padding: 30px 0 80px;
+      }
+
+      .slot-section {
+        margin: 0 0 48px;
+      }
+
+      .slot-title {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+
+        margin: 0 0 13px;
+
+        font-size: 21px;
+        letter-spacing: -0.02em;
+      }
+
+      .slot-title::before {
+        content: "";
+        width: 5px;
+        height: 23px;
+        flex: 0 0 5px;
+
+        border-radius: 10px;
+        background: linear-gradient(180deg, #84d4ff, #78efaa);
+
+        box-shadow: 0 0 16px rgba(108, 221, 189, 0.22);
+      }
+
+      /* ---------- Table ---------- */
+
+      .table-shell {
+        overflow: hidden;
+
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .table-scroll {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        min-width: 1120px;
+
+        border-collapse: collapse;
+        table-layout: fixed;
+      }
+
+      col.name-col {
+        width: 270px;
+      }
+
+      col.effect-col {
+        width: 30%;
+      }
+
+      col.rank-col {
+        width: 36%;
+      }
+
+      col.xp-col {
+        width: auto;
+      }
+
+      th,
+      td {
+        padding: 15px 17px;
+        text-align: left;
+        vertical-align: top;
+
+        border-bottom: 1px solid var(--border);
+      }
+
+      th {
+        /* Stickyにしない。
+     上部フィルターと重ならないよう通常配置にする。 */
+        position: static;
+
+        color: #bfc9d7;
+        background: rgba(25, 32, 43, 0.98);
+
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.035em;
+      }
+
+      tbody tr {
+        transition: background 0.12s ease;
+      }
+
+      tbody tr:hover {
+        background: var(--panel-hover);
+      }
+
+      tbody tr:last-child td {
+        border-bottom: 0;
+      }
+
+      /* ---------- Item ---------- */
+
+      .item {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+      }
+
+      .icon-frame {
+        position: relative;
+
+        display: grid;
+        place-items: center;
+
+        width: 58px;
+        height: 58px;
+        flex: 0 0 58px;
+
+        overflow: hidden;
+
+        border: 1px solid var(--border-strong);
+        border-radius: 12px;
+
+        background:
+          linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.035),
+            rgba(255, 255, 255, 0.008)
+          ),
+          #090d13;
+
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.03),
+          0 5px 15px rgba(0, 0, 0, 0.18);
+      }
+
+      .icon-frame img {
+        display: block;
+
+        width: 48px;
+        height: 48px;
+
+        max-width: 48px;
+        max-height: 48px;
+
+        object-fit: contain;
+
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+      }
+
+      /*
+  GIFはブラウザ標準の<img>でそのままアニメーションする。
+  object-fit: contain にしてフレームをクロップしない。
+*/
+
+      .icon-fallback {
+        display: none;
+
+        color: #5f6a79;
+        font-size: 9px;
+        font-weight: 800;
+        line-height: 1.05;
+        text-align: center;
+        letter-spacing: 0.05em;
+      }
+
+      .item-main {
+        min-width: 0;
+      }
+
+      .item-name {
+        display: inline-block;
+
+        color: #f2f6fb;
+        font-weight: 720;
+        font-size: 15px;
+        line-height: 1.3;
+
+        text-decoration: none;
+
+        transition:
+          color 0.12s ease,
+          text-shadow 0.12s ease;
+      }
+
+      .item-name:hover {
+        color: var(--link);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .item-id {
+        margin-top: 4px;
+
+        color: #657183;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+
+        font-size: 10px;
+        word-break: break-all;
+      }
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+
+        margin-top: 7px;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+
+        padding: 2px 7px;
+
+        border: 1px solid;
+        border-radius: 999px;
+
+        font-size: 10px;
+        font-weight: 680;
+        line-height: 1.5;
+      }
+
+      .tag-artifacts {
+        color: var(--artifact);
+        background: var(--artifact-bg);
+        border-color: var(--artifact-border);
+      }
+
+      .tag-relics {
+        color: var(--relic);
+        background: var(--relic-bg);
+        border-color: var(--relic-border);
+      }
+
+      /* ---------- Rank ---------- */
+
+      .rank-list {
+        margin: 0;
+        padding-left: 19px;
+      }
+
+      .rank-list li + li {
+        margin-top: 6px;
+      }
+
+      .rank-label {
+        color: var(--rank);
+        font-weight: 760;
+      }
+
+      .no-rank {
+        color: var(--muted);
+      }
+
+      /* ---------- Text ---------- */
+
+      td {
+        color: #d3d9e2;
+        font-size: 13px;
+      }
+
+      .empty {
+        padding: 50px 20px;
+
+        color: var(--muted);
+        text-align: center;
+
+        border: 1px dashed var(--border-strong);
+        border-radius: var(--radius);
+      }
+
+      /* ---------- Responsive ---------- */
+
+      @media (max-width: 820px) {
+        .site-header {
+          padding: 30px 16px 24px;
+        }
+
+        .container {
+          width: min(100% - 22px, 1480px);
+        }
+
+        .filters {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        #search {
+          grid-column: 1 / -1;
+        }
+
+        main {
+          padding-top: 22px;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .filters {
+          grid-template-columns: 1fr;
+        }
+
+        #search {
+          grid-column: auto;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <h1>ATM10 Relics / Artifacts 早見表</h1>
+        <p class="subtitle">
+          All the Mods 10 8.2 / Minecraft 1.21.1 / NeoForge — Relics &amp;
+          Reliquified Artifacts 日本語まとめ
+        </p>
+      </div>
+    </header>
+
+    <div class="filter-bar">
+      <div class="container filters">
+        <input
+          id="search"
+          class="control"
+          type="search"
+          autocomplete="off"
+          placeholder="名前・効果・ランク・レベルアップ条件を検索…"
+        />
+
+        <select id="slotFilter" class="control">
+          <option value="">すべての部位</option>
+        </select>
+
+        <select id="modFilter" class="control">
+          <option value="">すべてのMOD</option>
+          <option value="Artifacts">Artifacts</option>
+          <option value="Relics">Relics</option>
+        </select>
+      </div>
+    </div>
+
+    <main class="container">
+      <div id="content"></div>
+    </main>
+
+    <script>
+      "use strict";
+
+      const URLS = {
+        relicDocs: "https://shatterbyte.com/docs/mods/relics/relics/",
+
+        artifactDocs:
+          "https://shatterbyte.com/docs/mods/reliquified-artifacts/relics/",
+
+        relicImages:
+          "https://raw.githubusercontent.com/Octo-Studios/relics/1.21.1/" +
+          "src/main/resources/assets/relics/textures/item/",
+
+        artifactImages:
+          "https://raw.githubusercontent.com/ochotonida/artifacts/1.21.1/" +
+          "common/src/main/resources/assets/artifacts/textures/item/",
+      };
+
+      /*
+       * [部位, MOD, ID, 名前, 主効果, [[Rank, 効果], ...], XP条件]
+       */
+      const items = [
+        /* =========================================================
+   ARTIFACTS
+   ========================================================= */
+
+        [
+          "その他 / 手持ち",
+          "Artifacts",
+          "everlasting_beef",
+          "Everlasting Beef",
+          "チャージを消費して繰り返し食べられ、時間経過で再使用可能になる食料。",
+          [
+            ["R1", "食事時にHPを回復"],
+            ["R3", "確率でチャージを消費しない"],
+            ["R5", "食べる速度を短縮"],
+          ],
+          "使用する。能力によって回復したHP量でもRelic XPを得る。",
+        ],
+
+        [
+          "その他 / 手持ち",
+          "Artifacts",
+          "eternal_steak",
+          "Eternal Steak",
+          "Everlasting Beef系の再利用可能な食料。チャージを消費して食べ、時間経過で回復する。",
+          [
+            ["R1", "食事時にHPを回復"],
+            ["R3", "確率でチャージを消費しない"],
+            ["R5", "食べる速度を短縮"],
+          ],
+          "使用する。能力によって回復したHP量でもRelic XPを得る。",
+        ],
+
+        [
+          "その他 / 手持ち",
+          "Artifacts",
+          "umbrella",
+          "Umbrella",
+          "手に持つと落下を緩やかにする。使用すると盾のように攻撃を防ぐ。",
+          [
+            ["R1", "空中で反動ジャンプを利用可能"],
+            ["R3", "防御成功時に攻撃者を押し返す"],
+            ["R5", "反動移動後に一時的なVanishingを得る"],
+          ],
+          "低速落下・反動移動を行う。盾で攻撃を防ぐ。",
+        ],
+
+        [
+          "その他 / 手持ち",
+          "Artifacts",
+          "whoopee_cushion",
+          "Whoopee Cushion",
+          "ガス噴射を起こし、周囲の対象を押し飛ばす。",
+          [
+            ["R1", "被弾時にも能力が発生する"],
+            ["R3", "毒・吐き気などを伴うガス雲を生成"],
+            ["R5", "周囲の対象へParalyzeを付与"],
+          ],
+          "能力を発動する。ガス雲生成やParalyze成功でもRelic XPを得る。",
+        ],
+
+        /* ----- Head ----- */
+
+        [
+          "頭",
+          "Artifacts",
+          "night_vision_goggles",
+          "Night Vision Goggles",
+          "切り替え式の暗視能力を得る。",
+          [
+            ["R1", "暗所の霧を除去"],
+            ["R3", "暗所で敵の攻撃が一定確率でMiss"],
+            ["R5", "周囲が暗いほど与ダメージ上昇"],
+          ],
+          "暗所で能力を利用する。暗所回避効果の発動などで成長する。",
+        ],
+
+        [
+          "頭",
+          "Artifacts",
+          "plastic_drinking_hat",
+          "Plastic Drinking Hat",
+          "飲み物を通常より短時間で使用できる。",
+          [
+            ["R1", "飲用時に空気を回復"],
+            ["R3", "飲用時に満腹度を回復"],
+            ["R5", "飲用時にHPを回復"],
+          ],
+          "飲み物を使用し、追加回復効果を発生させる。",
+        ],
+
+        [
+          "頭",
+          "Artifacts",
+          "novelty_drinking_hat",
+          "Novelty Drinking Hat",
+          "Plastic Drinking Hatと同系統の高速飲用能力を持つ。",
+          [
+            ["R1", "飲用時に空気を回復"],
+            ["R3", "飲用時に満腹度を回復"],
+            ["R5", "飲用時にHPを回復"],
+          ],
+          "飲み物を使用し、追加回復効果を発生させる。",
+        ],
+
+        [
+          "頭",
+          "Artifacts",
+          "snorkel",
+          "Snorkel",
+          "水面から一定範囲内なら水中で呼吸を維持しやすくなる。",
+          [
+            ["R1", "水中の視界・霧を改善"],
+            ["R3", "深く潜った際に緊急Water Breathingを付与"],
+            ["R5", "溺水ダメージを軽減"],
+          ],
+          "水中で空気を消費する。緊急Water Breathingの発動でも成長する。",
+        ],
+
+        [
+          "頭",
+          "Artifacts",
+          "superstitious_hat",
+          "Superstitious Hat",
+          "Mob撃破時、確率で追加Looting効果を適用する。",
+          [
+            ["R1", "戦闘していない時間後の最初の撃破で発動率上昇"],
+            ["R3", "動物に対するLooting性能を強化"],
+            ["R5", "連続撃破で発動率上昇"],
+          ],
+          "追加Looting効果を発生させる。",
+        ],
+
+        [
+          "頭",
+          "Artifacts",
+          "villager_hat",
+          "Villager Hat",
+          "村人との取引価格を改善し、Iron Golemとの関係も有利になる。",
+          [
+            ["R1", "近くのIron Golem数に応じ被ダメージ軽減"],
+            ["R3", "確率で取引在庫を消費しない"],
+            ["R5", "取引結果を追加で得ることがある"],
+          ],
+          "村人と取引する。追加取引結果を得る。",
+        ],
+
+        [
+          "頭",
+          "Artifacts",
+          "cowboy_hat",
+          "Cowboy Hat",
+          "騎乗しているMobの能力を強化する。",
+          [
+            ["R1", "騎乗可能Mobを即時Tameしやすくする"],
+            ["R3", "騎乗中のAttack / Block Reach増加"],
+            ["R5", "騎乗中にAbsorptionを得る"],
+          ],
+          "騎乗状態で移動する。MobをTameする。",
+        ],
+
+        [
+          "頭",
+          "Artifacts",
+          "anglers_hat",
+          "Angler's Hat",
+          "釣果を確率で複数化し、釣り関連の利益を高める。",
+          [
+            ["R1", "魚を高速で食べる"],
+            ["R3", "魚を食べるとHP回復"],
+            ["R5", "魚の代わりにTreasureを釣ることがある"],
+          ],
+          "釣りを成功させる。魚を食べる。Treasureを釣る。",
+        ],
+
+        /* ----- Neck ----- */
+
+        [
+          "首",
+          "Artifacts",
+          "charm_of_sinking",
+          "Charm of Sinking",
+          "水底に立っている間、空気を回復できる。",
+          [
+            ["R1", "水中での移動制約を軽減"],
+            ["R3", "頭上の水深に応じて被ダメージ軽減"],
+            ["R5", "水底で静止するとImmortalityを得る"],
+          ],
+          "能力で空気を回復する。水中防御能力を利用する。",
+        ],
+
+        [
+          "首",
+          "Artifacts",
+          "cross_necklace",
+          "Cross Necklace",
+          "被ダメージ後の無敵時間を延長する。",
+          [
+            ["R1", "攻撃してきたアンデッドをHoly Fireで燃やす"],
+            ["R3", "アンデッドへの与ダメージ上昇"],
+            ["R5", "致死ダメージを一定確率で無効化"],
+          ],
+          "攻撃を受ける。アンデッドを着火する。致死ダメージ防止を発動する。",
+        ],
+
+        [
+          "首",
+          "Artifacts",
+          "flame_pendant",
+          "Flame Pendant",
+          "攻撃を受けた際、攻撃者を確率で炎上させる。",
+          [
+            ["R1", "炎上中の敵への与ダメージ上昇"],
+            ["R3", "火炎ダメージを無効化"],
+            ["R5", "自分が燃えている間HPを回復"],
+          ],
+          "敵を炎上させる。炎上中の敵へ攻撃する。",
+        ],
+
+        [
+          "首",
+          "Artifacts",
+          "panic_necklace",
+          "Panic Necklace",
+          "自分を狙っているMobが多いほど移動速度が上昇する。",
+          [
+            ["R1", "敵に狙われていない時の被ダメージ軽減"],
+            ["R3", "自分を狙っていたMob死亡時にHP回復"],
+            ["R5", "敵対対象数に応じ攻撃速度上昇"],
+          ],
+          "敵に狙われた状態で戦う。自分を狙うMobを倒す。",
+        ],
+
+        [
+          "首",
+          "Artifacts",
+          "lucky_scarf",
+          "Lucky Scarf",
+          "Fortune対象ブロック採掘時、追加Fortuneが発動することがある。",
+          [
+            ["R1", "失敗するほど次回発動率が上昇"],
+            ["R3", "成功連鎖で追加Fortune上限を強化"],
+            ["R5", "周囲の同種鉱石数に応じ発動率上昇"],
+          ],
+          "追加されたFortuneレベルに応じてRelic XPを得る。",
+        ],
+
+        [
+          "首",
+          "Artifacts",
+          "scarf_of_invisibility",
+          "Scarf of Invisibility",
+          "一定時間静止するとVanishing状態になり、行動すると解除される。",
+          [
+            ["R1", "透明解除後の最初の攻撃を強化"],
+            ["R3", "その初撃にStunを追加"],
+            ["R5", "Vanishing中にHP回復"],
+          ],
+          "Vanishingへ移行・解除する。透明状態から攻撃する。",
+        ],
+
+        [
+          "首",
+          "Artifacts",
+          "shock_pendant",
+          "Shock Pendant",
+          "被弾時に確率で攻撃者へ連鎖電撃を発生させる。",
+          [
+            ["R1", "雷ダメージを無効化"],
+            ["R3", "水中・雨天時に電撃を強化"],
+            ["R5", "攻撃者へTremorを付与"],
+          ],
+          "電撃を発生させる。雷ダメージ防止やTremor付与を利用する。",
+        ],
+
+        [
+          "首",
+          "Artifacts",
+          "thorn_pendant",
+          "Thorn Pendant",
+          "受けたダメージの一部を攻撃者へ反射する。",
+          [
+            ["R1", "反射時にPoisonを付与"],
+            ["R3", "毒状態の敵への与ダメージ上昇"],
+            ["R5", "Poisonを無効化"],
+          ],
+          "反射を発生させる。毒状態の対象を攻撃する。",
+        ],
+
+        [
+          "首",
+          "Artifacts",
+          "charm_of_shrinking",
+          "Charm of Shrinking",
+          "Shrink / Grow / Stabilizeを切り替え、自分のサイズを変える。",
+          [
+            ["R1", "小さいほど落下ダメージ軽減"],
+            ["R3", "小さいほどMobがターゲットを失いやすい"],
+            ["R5", "小さいほど攻撃を回避しやすい"],
+          ],
+          "縮小状態で移動する。落下軽減・攻撃回避を発動する。",
+        ],
+
+        /* ----- Belt ----- */
+
+        [
+          "腰",
+          "Artifacts",
+          "antidote_vessel",
+          "Antidote Vessel",
+          "自分へ付与された有害Effectの持続時間を短縮する。",
+          [
+            ["R1", "有害Effect数に応じ被ダメージ軽減"],
+            ["R3", "終了後、同じEffectの再付与を一時防止"],
+            ["R5", "有害Effectの強度を制限"],
+          ],
+          "有害Effectを受ける。",
+        ],
+
+        [
+          "腰",
+          "Artifacts",
+          "cloud_in_a_bottle",
+          "Cloud in a Bottle",
+          "空中で追加ジャンプを行える。",
+          [
+            ["R1", "Air Jump後にSlow Fall"],
+            ["R3", "上を向いてAir Jumpすると上昇力強化"],
+            ["R5", "空中連続ジャンプ中に攻撃を当てるとJumpを1回復"],
+          ],
+          "Air Jumpを行う。Combat Recoveryを成功させる。",
+        ],
+
+        [
+          "腰",
+          "Artifacts",
+          "crystal_heart",
+          "Crystal Heart",
+          "一時的な追加HP Reserveを持ち、失ったReserveは時間経過で再生する。",
+          [
+            ["R1", "Reserve満タン時の被ダメージ軽減"],
+            ["R3", "Reserve以下のHPで回復効果上昇"],
+            ["R5", "大きなダメージを受けた際にImmortality"],
+          ],
+          "Reserveを回復する。Immortalityを発動する。",
+        ],
+
+        [
+          "腰",
+          "Artifacts",
+          "helium_flamingo",
+          "Helium Flamingo",
+          "ダブルジャンプ後、一定時間ホバリング飛行できる。",
+          [
+            ["R1", "空中でProjectileダメージ上昇"],
+            ["R3", "Hover中の被ダメージ軽減"],
+            ["R5", "ほぼ静止している間は飛行時間を消費しない"],
+          ],
+          "Hover状態を維持する。",
+        ],
+
+        [
+          "腰",
+          "Artifacts",
+          "obsidian_skull",
+          "Obsidian Skull",
+          "一定時間、溶岩環境からのダメージに耐えられる。",
+          [
+            ["R1", "溶岩への着地時に落下ダメージ無効"],
+            ["R3", "溶岩内で移動速度上昇"],
+            ["R5", "溶岩内で受けるダメージ軽減"],
+          ],
+          "保護状態で溶岩に滞在する。溶岩へ安全に着地する。",
+        ],
+
+        [
+          "腰",
+          "Artifacts",
+          "universal_attractor",
+          "Universal Attractor",
+          "Pull / Push / Offを切り替えられるアイテム磁石。",
+          [
+            ["R1", "XP Orbも吸引"],
+            ["R3", "Push時に敵性Projectileを反射"],
+            ["R5", "Pull対象を直接自分へTeleport"],
+          ],
+          "アイテム・XP Orbを吸引する。Projectileを反射する。",
+        ],
+
+        [
+          "腰",
+          "Artifacts",
+          "chorus_totem",
+          "Chorus Totem",
+          "致死ダメージを防ぎ、近くの安全な場所へTeleportする。",
+          [
+            ["R1", "発動後の回復効果を強化"],
+            ["R3", "周囲の敵をBlind・ターゲット解除"],
+            ["R5", "発動後にVanishingを得る"],
+          ],
+          "Totemを発動する。敵をDisorientする。",
+        ],
+
+        [
+          "腰",
+          "Artifacts",
+          "warp_drive",
+          "Warp Drive",
+          "Ender Pearlを消費しなくなる代わりに専用クールダウンを持つ。",
+          [
+            ["R1", "Ender Pearlによる自傷を無効化"],
+            ["R3", "着地点周囲の敵をBlind・ターゲット解除"],
+            ["R5", "Ender Pearlが重力を受けず直進"],
+          ],
+          "Ender Pearlを使用する。到着時のDisorientを成功させる。",
+        ],
+
+        /* ----- Hands ----- */
+
+        [
+          "手",
+          "Artifacts",
+          "digging_claws",
+          "Digging Claws",
+          "採掘速度を上昇させる。",
+          [
+            ["R1", "素手での採掘能力を強化"],
+            ["R3", "連続採掘でさらに高速化"],
+            ["R5", "Fortuneを追加"],
+          ],
+          "ブロック採掘時にRelic XPを得る。",
+        ],
+
+        [
+          "手",
+          "Artifacts",
+          "feral_claws",
+          "Feral Claws",
+          "連続攻撃するとChargeが溜まり、攻撃速度が上昇する。",
+          [
+            ["R1", "被弾でCharge消失タイマーをリセット"],
+            ["R3", "Chargeが徐々に減衰するようになる"],
+            ["R5", "敵の無敵Frameを短縮"],
+          ],
+          "Chargeを獲得する。",
+        ],
+
+        [
+          "手",
+          "Artifacts",
+          "fire_gauntlet",
+          "Fire Gauntlet",
+          "攻撃した対象を炎上させる。",
+          [
+            ["R1", "炎上中の敵へのダメージ上昇"],
+            ["R3", "炎を近くの対象へ伝播"],
+            ["R5", "炎上中の敵死亡時に攻撃性Sparkを生成"],
+          ],
+          "対象を炎上させる。Sparkを敵へ命中させる。",
+        ],
+
+        [
+          "手",
+          "Artifacts",
+          "golden_hook",
+          "Golden Hook",
+          "Mob撃破時に得られる経験値を増加させる。",
+          [
+            ["R1", "XP Orbを自動吸引"],
+            ["R3", "攻撃対象の周囲にいるMobを引き寄せる"],
+            ["R5", "敵の手持ちを落とさせることがある"],
+          ],
+          "Bonus XP、Pull、Disarmを発生させる。",
+        ],
+
+        [
+          "手",
+          "Artifacts",
+          "pocket_piston",
+          "Pocket Piston",
+          "Attack ReachとBlock Interaction Reachを延長する。",
+          [
+            ["R1", "素手攻撃へKnockbackを追加"],
+            ["R3", "遠距離からの攻撃・採掘を強化"],
+            ["R5", "最大射程付近からの攻撃でStun"],
+          ],
+          "通常Reach外から攻撃・採掘・設置する。Stunを成功させる。",
+        ],
+
+        [
+          "手",
+          "Artifacts",
+          "power_glove",
+          "Power Glove",
+          "一定回数ごとの攻撃を追加ダメージ付きPower Strikeへ変える。",
+          [
+            ["R1", "Power StrikeでShieldを破壊"],
+            ["R3", "Power StrikeがArmorを貫通"],
+            ["R5", "Power Strikeで倒すと次の攻撃もPower Strike"],
+          ],
+          "Power Strikeを発動する。Power Strikeで敵を倒す。",
+        ],
+
+        [
+          "手",
+          "Artifacts",
+          "vampiric_glove",
+          "Vampiric Glove",
+          "与えたダメージの一部をHPとして吸収する。",
+          [
+            ["R1", "連続攻撃で吸血効率上昇"],
+            ["R3", "敵撃破時にHP回復"],
+            ["R5", "余剰回復をAbsorptionへ変換"],
+          ],
+          "このアイテムの能力でHPを回復する。",
+        ],
+
+        [
+          "手",
+          "Artifacts",
+          "onion_ring",
+          "Onion Ring",
+          "Saturationが高いほど採掘速度が上昇する。",
+          [
+            ["R1", "食事後、一時的に採掘速度強化"],
+            ["R3", "採掘時に確率で満腹度を回復"],
+            ["R5", "最大Saturation時に一部ブロックを即破壊"],
+          ],
+          "採掘する。能力で満腹度を回復する。",
+        ],
+
+        [
+          "手",
+          "Artifacts",
+          "pickaxe_heater",
+          "Pickaxe Heater",
+          "鉱石採掘時、確率でドロップを自動精錬する。",
+          [
+            ["R1", "Pickaxeで攻撃した対象を炎上"],
+            ["R3", "精錬失敗するほど次回発動率上昇"],
+            ["R5", "自動精錬時に追加Fortuneが発生することがある"],
+          ],
+          "自動精錬、Pickaxe着火、追加Fortuneを発生させる。",
+        ],
+
+        [
+          "手",
+          "Artifacts",
+          "withered_bracelet",
+          "Withered Bracelet",
+          "攻撃時に確率でWitherを付与する。",
+          [
+            ["R1", "Witherダメージを無効化"],
+            ["R3", "Wither中の敵死亡時に周囲へ伝播"],
+            ["R5", "Witherダメージを吸収してHP回復"],
+          ],
+          "新しい対象へWitherを付与する。",
+        ],
+
+        /* ----- Feet ----- */
+
+        [
+          "足",
+          "Artifacts",
+          "aqua_dashers",
+          "Aqua-Dashers",
+          "水面を走れる。移動を続けると速度が上がる。",
+          [
+            ["R1", "水面からのジャンプ力上昇"],
+            ["R3", "Sprintなしでも水面を移動可能"],
+            ["R5", "水上移動中、敵性Projectileを透過"],
+          ],
+          "水面を移動する。強化JumpやProjectile透過を発動する。",
+        ],
+
+        [
+          "足",
+          "Artifacts",
+          "bunny_hoppers",
+          "Bunny Hoppers",
+          "Jump長押しで通常より高く飛び上がる。",
+          [
+            ["R1", "発射時に周囲を吹き飛ばす"],
+            ["R3", "着地ダメージを無効化"],
+            ["R5", "上昇高度に応じ空中攻撃ダメージ上昇"],
+          ],
+          "High Jumpを利用する。High Jump後の空中攻撃を命中させる。",
+        ],
+
+        [
+          "足",
+          "Artifacts",
+          "flippers",
+          "Flippers",
+          "水泳速度を上昇させる。",
+          [
+            ["R1", "水中で重力の影響を抑える"],
+            ["R3", "水中での空気消費を低減"],
+            ["R5", "水中で敵の攻撃が一定確率でMiss"],
+          ],
+          "泳ぐ。水中回避を発動する。",
+        ],
+
+        [
+          "足",
+          "Artifacts",
+          "kitty_slippers",
+          "Kitty Slippers",
+          "CreeperとPhantomが近づきにくくなり、致死ダメージをHP1で耐えることがある。",
+          [
+            ["R1", "Sneak移動速度上昇"],
+            ["R3", "落下ダメージ軽減"],
+            ["R5", "被弾後、次の敵攻撃が一定確率でMiss"],
+          ],
+          "Nine Livesや回避能力を発動する。",
+        ],
+
+        [
+          "足",
+          "Artifacts",
+          "running_shoes",
+          "Running Shoes",
+          "走り続けるほど移動速度が上昇する。",
+          [
+            ["R1", "速度に応じStep Height増加"],
+            ["R3", "走行中Jumpで加速蓄積を強化"],
+            ["R5", "最大速度時にImmortality"],
+          ],
+          "連続走行する。走行中にJumpする。",
+        ],
+
+        [
+          "足",
+          "Artifacts",
+          "steadfast_spikes",
+          "Steadfast Spikes",
+          "ノックバックと滑りを抑え、壁面ではゆっくり降下できる。",
+          [
+            ["R1", "Wall Slide中の被ダメージ軽減"],
+            ["R3", "Sneak中の固定力を強化"],
+            ["R5", "静止中は極めて動かされにくくなる"],
+          ],
+          "攻撃を受ける。Wall Slideを利用する。",
+        ],
+
+        [
+          "足",
+          "Artifacts",
+          "snowshoes",
+          "Snowshoes",
+          "雪上での移動を高速化する。",
+          [
+            ["R1", "Powder Snowへ沈まない"],
+            ["R3", "凍結を無効化"],
+            ["R5", "雪から離れても速度Bonusが一定時間残る"],
+          ],
+          "雪上を移動する。",
+        ],
+
+        [
+          "足",
+          "Artifacts",
+          "rooted_boots",
+          "Rooted Boots",
+          "Grassを踏みながら移動すると地面をDirt化し、満腹度・Saturationを回復する。",
+          [
+            ["R1", "使用したDirtが後からGrassへ戻る"],
+            ["R3", "能力発動時にHPも回復"],
+            ["R5", "周囲の植物へ定期的にBone Meal効果"],
+          ],
+          "Grassを利用する。Bone Meal効果を発生させる。",
+        ],
+
+        [
+          "足",
+          "Artifacts",
+          "strider_shoes",
+          "Strider Shoes",
+          "溶岩の表面を歩ける。",
+          [
+            ["R1", "溶岩面でのJumpを強化"],
+            ["R3", "Sneakなしでも溶岩面を歩行"],
+            ["R5", "溶岩面移動中に火炎ダメージを無効化"],
+          ],
+          "溶岩面を移動する。強化Jumpを利用する。",
+        ],
+
+        /* =========================================================
+   RELICS
+   ========================================================= */
+
+        /* ----- Mantles ----- */
+
+        [
+          "背中 / Mantle",
+          "Relics",
+          "leafy_mantle",
+          "Leafy Mantle",
+          "葉をすり抜け、葉の中で徐々に回復する。致死時には周囲の葉を消費して生存できる。",
+          [
+            ["R1", "救命時に葉のProjectileを放つ"],
+            ["R3", "葉の中でAbsorptionを得る"],
+            ["R5", "葉の中でInvisibilityを得る"],
+          ],
+          "葉の中に滞在・回復する。救命や葉Projectileを利用する。",
+        ],
+
+        [
+          "背中 / Mantle",
+          "Relics",
+          "midnight_mantle",
+          "Midnight Mantle",
+          "月相に応じて戦闘・耐久性能が変化し、暗所や星を利用した能力を持つ。",
+          [
+            ["R1", "月相能力を拡張"],
+            ["R3", "影からの最初の攻撃を強化"],
+            ["R5", "星の爆発へStunを追加"],
+            ["R7", "Starfallが追加対象へBounce"],
+          ],
+          "月相Bonus、暗所、星・星座・Starfall能力を利用する。",
+        ],
+
+        [
+          "背中 / Mantle",
+          "Relics",
+          "glitchy_mantle",
+          "Glitchy Mantle",
+          "敵の攻撃を確率で外させ、Glitch Copyを残す。空中歩行も可能。",
+          [
+            ["R1", "Missした攻撃者を混乱・ターゲット解除"],
+            ["R3", "Glitch Copyが自分の攻撃を複製"],
+            ["R5", "固体ブロックをPhase可能"],
+          ],
+          "攻撃をMissさせる。Copy、空中歩行、Block Phaseを利用する。",
+        ],
+
+        [
+          "背中 / Mantle",
+          "Relics",
+          "ghostly_mantle",
+          "Ghostly Mantle",
+          "移動跡へMistを残し、視線を合わせた敵を弱体化する。致死ダメージ回避能力も持つ。",
+          [
+            ["R1", "MistへTremorを追加"],
+            ["R3", "Gaze Chargeに応じ攻撃性能上昇"],
+            ["R5", "救命後の反撃を強化"],
+          ],
+          "Mist、Gaze、Spectral救命能力を利用する。",
+        ],
+
+        /* ----- Feet ----- */
+
+        [
+          "足",
+          "Relics",
+          "springy_boot",
+          "Springy Boot",
+          "特殊Dashと着地Bounceを利用して高速移動する。",
+          [
+            ["R1", "発動後、次の着地までInvisibility"],
+            ["R3", "Bounce回数に応じ与ダメージ上昇"],
+            ["R5", "Crouch着地でShockwaveとStun"],
+          ],
+          "Spring Dash・Bounceを利用する。",
+        ],
+
+        [
+          "足",
+          "Relics",
+          "roller_skate",
+          "Roller Skate",
+          "移動を続けるほど加速し、Drift時には攻撃性Sparkを発生させる。",
+          [
+            ["R1", "Step Height増加"],
+            ["R3", "速度に応じ被ダメージ軽減"],
+            ["R5", "Driftで攻撃Sparkを生成"],
+          ],
+          "Skating、Spark、速度によるダメージ軽減を利用する。",
+        ],
+
+        [
+          "足",
+          "Relics",
+          "cut_glass_boot",
+          "Cut Glass Boot",
+          "複数種類の液体を保存し、装備時は保存済み液体の表面を歩ける。",
+          [],
+          "保存済み液体の表面を移動する。",
+        ],
+
+        /* ----- Belt ----- */
+
+        [
+          "腰",
+          "Relics",
+          "kinetic_belt",
+          "Kinetic Belt",
+          "Charm Slotを増やし、空中でMomentumを維持するGlide能力を得る。",
+          [
+            ["R1", "落下ダメージを防ぎMomentumを保持"],
+            ["R3", "Glide中のProjectileダメージ上昇"],
+            ["R5", "Glide中の被ダメージ軽減"],
+          ],
+          "Glide・Momentum移動を利用する。",
+        ],
+
+        [
+          "腰",
+          "Relics",
+          "hunting_belt",
+          "Hunting Belt",
+          "Charm Slotを増やし、Tamed Petの攻撃力を強化する。",
+          [
+            ["R1", "近くのPet数に応じ主人の被ダメージ軽減"],
+            ["R3", "Pet攻撃が敵の無敵Frameを無視"],
+            ["R5", "Pet死亡後、復活可能なBoneを残す"],
+          ],
+          "Petに攻撃させる。Pet防御・復活能力を利用する。",
+        ],
+
+        /* ----- Neck ----- */
+
+        [
+          "首",
+          "Relics",
+          "reflective_necklace",
+          "Reflective Necklace",
+          "受けたダメージの一部をOrbとして保存し、反撃時に敵へ発射する。",
+          [
+            ["R1", "Orb命中時にStun"],
+            ["R3", "Orbが複数の敵を貫通"],
+            ["R5", "Orbが壁などでBounce"],
+          ],
+          "ダメージをOrbへ保存する。Orbを敵へ命中させる。",
+        ],
+
+        [
+          "首",
+          "Relics",
+          "jellyfish_necklace",
+          "Jellyfish Necklace",
+          "水中・雨天で能力が強化され、連鎖電撃とParalyzeを利用できる。",
+          [
+            ["R1", "水・雨環境で連鎖電撃を強化"],
+            ["R3", "水から出た際にAbsorptionを得る"],
+            ["R5", "通常攻撃でもParalyze可能"],
+          ],
+          "水中回復、電撃、Paralyzeを利用する。",
+        ],
+
+        /* ----- Head ----- */
+
+        [
+          "頭",
+          "Relics",
+          "piglin_mask",
+          "Piglin Mask",
+          "Piglinを中立化し、Barterを有利にする。",
+          [
+            ["R1", "Piglinが自分を防衛"],
+            ["R3", "Barterをまとめて処理"],
+            ["R5", "Golden Tooth取得時に一時Buff"],
+          ],
+          "PiglinとのBarter、防衛、Golden Tooth取得を行う。",
+        ],
+
+        [
+          "頭",
+          "Relics",
+          "chef_hat",
+          "Chef's Hat",
+          "Mob撃破時に食べられるMeatballを落とすことがある。",
+          [
+            ["R1", "Meatballを高速で食べる"],
+            ["R3", "Meatball使用時にHP回復"],
+            ["R5", "Cooked MeatballとしてDrop"],
+          ],
+          "MeatballをDrop・使用し、追加回復を得る。",
+        ],
+
+        /* ----- Ring ----- */
+
+        [
+          "指輪",
+          "Relics",
+          "ring_of_the_seven_deadly_sins",
+          "Ring of the Seven Deadly Sins",
+          "Pride・Envy・Wrath・Sloth・Greed・Gluttony・Lustの7能力を持つ。",
+          [],
+          "各Sin固有の条件で成長する。高低差戦闘、HP差、採掘、Loot、食事、繁殖など。",
+        ],
+
+        /* ----- Utility ----- */
+
+        [
+          "Charm / Utility",
+          "Relics",
+          "chorus_staff",
+          "Chorus Staff",
+          "視線方向へ短距離TeleportするActive Relic。",
+          [
+            ["R1", "Teleport先周囲の敵がターゲットを失う"],
+            ["R3", "Teleport後の落下ダメージを防ぐ"],
+            ["R5", "視線先Blockへの精密Teleport"],
+          ],
+          "Teleport、ターゲット解除、安全着地能力を利用する。",
+        ],
+
+        [
+          "Charm / Utility",
+          "Relics",
+          "sphere_of_self_sacrifice",
+          "Sphere of Self-Sacrifice",
+          "最大HPの一部を代償として支払い、その後より多くのHPを時間経過で取り戻す。",
+          [
+            ["R1", "回復Stack数に応じ被ダメージ軽減"],
+            ["R3", "残った回復量をBlood Projectileへ変換"],
+            ["R5", "大ダメージを抑え回復Stackへ変換"],
+          ],
+          "能力を使用する。能力でダメージを軽減・無効化する。",
+        ],
+
+        [
+          "Charm / Utility",
+          "Relics",
+          "clot_of_time",
+          "Clot of Time",
+          "直近数秒の自分の移動経路を巻き戻す。",
+          [
+            ["R1", "Rewind中のダメージを無効化"],
+            ["R3", "周囲の敵が自分を見失う"],
+            ["R5", "過去のより高いHPへ巻き戻せる"],
+          ],
+          "Rewindを利用する。HPを復元する。",
+        ],
+
+        [
+          "Charm / Utility",
+          "Relics",
+          "rider_flute",
+          "Rider Flute",
+          "Tame済みの騎乗Mobを収納・召喚・Recallできる。",
+          [
+            ["R1", "収納中のMountを回復"],
+            ["R3", "離れすぎたMountを自動Recall"],
+            ["R5", "騎乗中、双方の被ダメージ軽減"],
+          ],
+          "騎乗移動、Mount回復、Recall、ダメージ軽減を利用する。",
+        ],
+
+        [
+          "Charm / Utility",
+          "Relics",
+          "experience_disperser",
+          "Experience Disperser",
+          "ひとつのRelicが獲得したXPの一部を他の装備中Relicへ分配する。",
+          [
+            ["R1", "経験値分配性能を強化"],
+            ["R3", "Minecraft XPの一部もRelic成長へ利用"],
+            ["R5", "XP元Relicが最大でも分配可能"],
+          ],
+          "他のRelicへRelic XPを分配する。",
+        ],
+
+        [
+          "手持ち / Shield",
+          "Relics",
+          "shield_of_retaliation",
+          "Shield of Retaliation",
+          "短いParry Windowで正面攻撃を完全防御する。",
+          [
+            ["R1", "Projectileを停止・反射"],
+            ["R3", "Parry成功時に前方の敵をStun"],
+            ["R5", "Parry Window中の防御対象を拡張"],
+          ],
+          "Parryでダメージを防ぐ。Stunを成功させる。",
+        ],
+      ];
+
+      /* =========================================================
+   Rendering
+   ========================================================= */
+
+      const slotOrder = [
+        "頭",
+        "背中 / Mantle",
+        "首",
+        "腰",
+        "手",
+        "指輪",
+        "足",
+        "Charm / Utility",
+        "手持ち / Shield",
+        "その他 / 手持ち",
+      ];
+
+      const search = document.getElementById("search");
+
+      const slotFilter = document.getElementById("slotFilter");
+
+      const modFilter = document.getElementById("modFilter");
+
+      const content = document.getElementById("content");
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function toItem(raw) {
+        const [slot, mod, id, name, main, ranks, xp] = raw;
+
+        return {
+          slot,
+          mod,
+          id,
+          name,
+          main,
+          ranks,
+          xp,
+        };
+      }
+
+      function docsUrl(item) {
+        if (item.mod === "Artifacts") {
+          return URLS.artifactDocs + encodeURIComponent(item.id) + "/";
+        }
+
+        return URLS.relicDocs + encodeURIComponent(item.id) + "/";
+      }
+
+      /*
+       * GIF対応
+       *
+       * 1. <img>自体はGIFをネイティブ再生する。
+       * 2. まず .gif を試す。
+       * 3. 存在しなければ onerror で .png へフォールバック。
+       *
+       * PNGしか存在しない通常アイテムもそのまま表示可能。
+       */
+      function imageCandidates(item) {
+        const base =
+          item.mod === "Artifacts" ? URLS.artifactImages : URLS.relicImages;
+
+        return [base + item.id + ".gif", base + item.id + ".png"];
+      }
+
+      function installImageFallback(img, urls) {
+        let index = 0;
+
+        const tryNext = () => {
+          if (index >= urls.length) {
+            img.style.display = "none";
+
+            const fallback = img.parentElement.querySelector(".icon-fallback");
+
+            if (fallback) {
+              fallback.style.display = "block";
+            }
+
+            return;
+          }
+
+          img.src = urls[index++];
+        };
+
+        img.addEventListener("error", tryNext);
+
+        tryNext();
+      }
+
+      function modTag(mod) {
+        const className = mod === "Artifacts" ? "tag-artifacts" : "tag-relics";
+
+        return `<span class="tag ${className}">` + escapeHtml(mod) + `</span>`;
+      }
+
+      function ranksHtml(ranks) {
+        if (!ranks || ranks.length === 0) {
+          return (
+            `<span class="no-rank">` +
+            `固有システム / 標準Rank追加効果なし` +
+            `</span>`
+          );
+        }
+
+        return (
+          `<ul class="rank-list">` +
+          ranks
+            .map(
+              ([rank, effect]) =>
+                `<li>` +
+                `<span class="rank-label">` +
+                escapeHtml(rank) +
+                `</span>` +
+                `：` +
+                escapeHtml(effect) +
+                `</li>`,
+            )
+            .join("") +
+          `</ul>`
+        );
+      }
+
+      function itemSearchText(item) {
+        return [
+          item.slot,
+          item.mod,
+          item.id,
+          item.name,
+          item.main,
+          item.xp,
+          ...item.ranks.flat(),
+        ]
+          .join(" ")
+          .toLowerCase();
+      }
+
+      function rowHtml(item, index) {
+        const urls = imageCandidates(item);
+
+        return `
+    <tr>
+      <td>
+        <div class="item">
+
+          <div class="icon-frame">
+            <img
+              class="item-image"
+              data-image-index="${index}"
+              alt="${escapeHtml(item.name)}"
+              loading="lazy"
+              decoding="async"
+            >
+            <span class="icon-fallback">
+              NO<br>IMG
+            </span>
+          </div>
+
+          <div class="item-main">
+            <a
+              class="item-name"
+              href="${docsUrl(item)}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ${escapeHtml(item.name)}
+            </a>
+
+            <div class="item-id">
+              ${
+                item.mod === "Artifacts" ? "artifacts" : "relics"
+              }:${escapeHtml(item.id)}
+            </div>
+
+            <div class="tags">
+              ${modTag(item.mod)}
+            </div>
+          </div>
+
+        </div>
+      </td>
+
+      <td>
+        ${escapeHtml(item.main)}
+      </td>
+
+      <td>
+        ${ranksHtml(item.ranks)}
+      </td>
+
+      <td>
+        ${escapeHtml(item.xp)}
+      </td>
+    </tr>
+  `;
+      }
+
+      function render() {
+        const query = search.value.trim().toLowerCase();
+
+        const selectedSlot = slotFilter.value;
+
+        const selectedMod = modFilter.value;
+
+        const normalized = items.map(toItem);
+
+        const filtered = normalized.filter((item) => {
+          if (selectedSlot && item.slot !== selectedSlot) {
+            return false;
+          }
+
+          if (selectedMod && item.mod !== selectedMod) {
+            return false;
+          }
+
+          if (query && !itemSearchText(item).includes(query)) {
+            return false;
+          }
+
+          return true;
+        });
+
+        let html = "";
+        let imageIndex = 0;
+
+        for (const slot of slotOrder) {
+          const slotItems = filtered.filter((item) => item.slot === slot);
+
+          if (!slotItems.length) {
+            continue;
+          }
+
+          const rows = [];
+
+          for (const item of slotItems) {
+            rows.push(rowHtml(item, imageIndex++));
+          }
+
+          html += `
+      <section class="slot-section">
+
+        <h2 class="slot-title">
+          ${escapeHtml(slot)}
+        </h2>
+
+        <div class="table-shell">
+          <div class="table-scroll">
+
+            <table>
+              <colgroup>
+                <col class="name-col">
+                <col class="effect-col">
+                <col class="rank-col">
+                <col class="xp-col">
+              </colgroup>
+
+              <thead>
+                <tr>
+                  <th>名前 / MOD</th>
+                  <th>主効果</th>
+                  <th>ランク別追加効果</th>
+                  <th>レベルアップ条件</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${rows.join("")}
+              </tbody>
+
+            </table>
+
+          </div>
+        </div>
+
+      </section>
+    `;
+        }
+
+        if (!html) {
+          html = `
+      <div class="empty">
+        条件に一致するアイテムが見つからぬ。
+      </div>
+    `;
+        }
+
+        content.innerHTML = html;
+
+        /*
+         * HTML挿入後に画像フォールバックを設定。
+         * GIFが存在すればGIF、
+         * なければPNGへ自動的に切り替える。
+         */
+        let installedIndex = 0;
+
+        for (const slot of slotOrder) {
+          const slotItems = filtered.filter((item) => item.slot === slot);
+
+          for (const item of slotItems) {
+            const img = content.querySelector(
+              `[data-image-index="${installedIndex}"]`,
+            );
+
+            if (img) {
+              installImageFallback(img, imageCandidates(item));
+            }
+
+            installedIndex++;
+          }
+        }
+      }
+
+      /* =========================================================
+   Filters
+   ========================================================= */
+
+      for (const slot of slotOrder) {
+        const option = document.createElement("option");
+
+        option.value = slot;
+
+        option.textContent = slot;
+
+        slotFilter.appendChild(option);
+      }
+
+      search.addEventListener("input", render);
+
+      slotFilter.addEventListener("change", render);
+
+      modFilter.addEventListener("change", render);
+
+      render();
+    </script>
+  </body>
+</html>
