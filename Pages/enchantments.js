@@ -1,1 +1,105 @@
-(() => {"use strict";const records=typeof ENCHANTMENTS!=="undefined"?ENCHANTMENTS:[];const $=id=>document.getElementById(id);const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));const roman=n=>{const a=["","I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX"];return a[n]||String(n)};const unique=key=>[...new Set(records.flatMap(r=>Array.isArray(r[key])?r[key]:[r[key]]).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),"ja"));function fill(id,values){const el=$(id);values.forEach(v=>{const o=document.createElement("option");o.value=v;o.textContent=v;el.appendChild(o)})}fill("modFilter",unique("modName"));fill("categoryFilter",unique("categories"));fill("levelFilter",[...new Set(records.map(r=>r.maxLevel))].sort((a,b)=>a-b).map(String));function status(r){return r.availability==="inactive"?"入手不可 / technical":r.availability==="special"?"特殊入手":r.availability==="unknown"?"MOD固有 / 要確認":"通常利用"}function row(r){return "<tr><td><div class='name-ja'>"+esc(r.nameJa)+"</div><div class='name-en'>"+esc(r.nameEn)+"</div><span class='registry'>"+esc(r.id)+"</span><span class='tag'>"+esc(r.modName)+"</span></td><td><strong>"+esc(roman(r.maxLevel))+"</strong><br><span class='status "+esc(r.availability)+"'>"+esc(status(r))+"</span></td><td>"+r.categories.map(esc).join("<br>")+"</td><td>"+esc(r.effect)+"</td><td>"+r.obtain.map(esc).join("<br>")+"</td><td>"+(r.conflicts.length?r.conflicts.map(esc).join("<br>"):"<span class='muted'>—</span>")+"</td></tr>"}function render(){const q=$("search").value.trim().toLocaleLowerCase();const mod=$("modFilter").value,cat=$("categoryFilter").value,lv=$("levelFilter").value,curse=$("curseFilter").value,obtain=$("obtainFilter").value;const filtered=records.filter(r=>{const hay=[r.id,r.nameJa,r.nameEn,r.effect,r.modName,...r.categories,...r.obtain,...r.conflicts].join(" ").toLocaleLowerCase();return(!q||hay.includes(q))&&(!mod||r.modName===mod)&&(!cat||r.categories.includes(cat))&&(!lv||String(r.maxLevel)===lv)&&(!curse||(curse==="curse"?r.curse:!r.curse))&&(!obtain||r.availability===obtain)});$("rows").innerHTML=filtered.map(row).join("");$("summary").textContent=filtered.length+" / "+records.length+" 件を表示中"}["search","modFilter","categoryFilter","levelFilter","curseFilter","obtainFilter"].forEach(id=>$(id).addEventListener("input",render));render()})();
+(() => {
+  "use strict";
+
+  const records = typeof ENCHANTMENTS !== "undefined" ? ENCHANTMENTS : [];
+  const $ = (id) => document.getElementById(id);
+
+  const esc = (value) =>
+    String(value ?? "").replace(/[&<>"']/g, (character) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      })[character],
+    );
+
+  const unique = (key) =>
+    [...new Set(records.flatMap((record) =>
+      Array.isArray(record[key]) ? record[key] : [record[key]],
+    ).filter(Boolean))].sort((a, b) => String(a).localeCompare(String(b), "ja"));
+
+  const fill = (id, values) => {
+    const element = $(id);
+    if (!element) return;
+
+    values.forEach((value) => {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = value;
+      element.appendChild(option);
+    });
+  };
+
+  const modHue = (modName) => {
+    let hash = 0;
+    for (const character of String(modName)) {
+      hash = (hash * 31 + character.codePointAt(0)) % 360;
+    }
+    return hash;
+  };
+
+  fill("modFilter", unique("modName"));
+  fill("categoryFilter", unique("categories"));
+
+  const equipmentTags = (categories) =>
+    `<div class="equipment-tags">${categories
+      .map((category) => `<span class="tag equipment-tag">${esc(category)}</span>`)
+      .join("")}</div>`;
+
+  const modTag = (modName) =>
+    `<span class="tag mod-tag" style="--mod-hue: ${modHue(modName)}">${esc(modName)}</span>`;
+
+  const effectText = (record) =>
+    record.effect.replace(/^対応MODのデータに基づく効果（(.+)）。$/, "効果情報を確認中（MOD固有: $1）");
+
+  const row = (record) => `
+    <tr>
+      <td>
+        <div class="name-ja">${esc(record.nameJa)}</div>
+        <div class="name-en">${esc(record.nameEn)}</div>
+        <span class="registry">${esc(record.id)}</span>
+        ${modTag(record.modName)}
+      </td>
+      <td>${equipmentTags(record.categories)}</td>
+      <td>${esc(effectText(record))}</td>
+      <td>${record.conflicts.length
+        ? record.conflicts.map(esc).join("<br>")
+        : '<span class="muted">—</span>'}</td>
+    </tr>`;
+
+  const render = () => {
+    const query = $("search").value.trim().toLocaleLowerCase();
+    const mod = $("modFilter").value;
+    const category = $("categoryFilter").value;
+    const curse = $("curseFilter").value;
+
+    const filtered = records.filter((record) => {
+      const haystack = [
+        record.id,
+        record.nameJa,
+        record.nameEn,
+        record.effect,
+        record.modName,
+        ...record.categories,
+        ...record.conflicts,
+      ].join(" ").toLocaleLowerCase();
+
+      return (!query || haystack.includes(query))
+        && (!mod || record.modName === mod)
+        && (!category || record.categories.includes(category))
+        && (!curse || (curse === "curse" ? record.curse : !record.curse));
+    });
+
+    $("rows").innerHTML = filtered.map(row).join("");
+    $("summary").textContent = `${filtered.length} / ${records.length} 件を表示中`;
+  };
+
+  $("search").addEventListener("input", render);
+  ["modFilter", "categoryFilter", "curseFilter"].forEach((id) => {
+    $(id).addEventListener("change", render);
+  });
+
+  render();
+})();
