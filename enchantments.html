@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="./styles.css" />
     <script src="./site.js" defer></script>
   </head>
-  <body>
+  <body class="enchantment-page">
     <header class="site-header">
       <div class="container">
         <h1>ATM10 Enchantments 早見表</h1>
@@ -55,8 +55,14 @@
 
     <main class="container">
       <div id="summary" class="summary" aria-live="polite"></div>
-      <div class="table-wrap">
+      <div class="table-wrap enchantment-table">
         <table>
+          <colgroup>
+            <col class="enchant-name-col" />
+            <col class="enchant-equipment-col" />
+            <col class="enchant-effect-col" />
+            <col class="enchant-conflicts-col" />
+          </colgroup>
           <thead>
             <tr>
               <th>名前 / MOD</th>
