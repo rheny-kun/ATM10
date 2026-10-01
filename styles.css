@@ -345,3 +345,114 @@ td { color: #d9e0eb; font-size: 13px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Relics detail cards --------------------------------------------------- */
+.relics-page table { min-width: 1180px; }
+.relics-page col.name-col { width: 330px; }
+.relics-page col.effect-col { width: 28%; }
+.relics-page col.rank-col { width: 34%; }
+.relics-page col.xp-col { width: 180px; }
+.slot-tag {
+  color: #b9d9ff;
+  border-color: rgba(130, 186, 255, .34);
+  background: rgba(72, 112, 161, .18);
+}
+.relic-details {
+  margin-top: 12px;
+  border: 1px solid rgba(164, 184, 212, .18);
+  border-radius: 11px;
+  background: rgba(9, 15, 25, .62);
+}
+.relic-details summary {
+  padding: 8px 10px;
+  color: var(--link);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 800;
+  list-style-position: inside;
+}
+.relic-details summary:hover,
+.relic-details summary:focus-visible {
+  color: var(--accent);
+  outline: 2px solid rgba(126, 240, 179, .3);
+  outline-offset: -2px;
+}
+.relic-detail-body {
+  display: grid;
+  gap: 11px;
+  padding: 0 10px 11px;
+  color: #c8d4e4;
+  font-size: 11px;
+}
+.relic-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.relic-detail-grid > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.detail-label {
+  color: #7f91a9;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.relic-detail-grid code {
+  overflow-wrap: anywhere;
+  color: #b9d9ff;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 10px;
+}
+.detail-section { display: grid; gap: 6px; }
+.ability-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.ability-chip {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px 7px;
+  color: #d9f2ff;
+  border: 1px solid rgba(130, 186, 255, .25);
+  border-radius: 8px;
+  background: rgba(35, 66, 100, .28);
+  font-size: 10px;
+  font-weight: 700;
+}
+.ability-chip small { color: #8297b2; font-size: 9px; font-weight: 500; }
+.relic-level-control label { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.relic-level-control output { color: var(--accent); font-size: 11px; font-variant-numeric: tabular-nums; }
+.relic-level-slider { width: 100%; accent-color: var(--accent); cursor: pointer; }
+.detail-note { margin: 0; color: #8291a5; font-size: 10px; line-height: 1.55; }
+
+/* Enchantment detail cards -------------------------------------------- */
+.enchantment-table .enchant-details {
+  margin-top: 10px;
+  border: 1px solid rgba(164, 184, 212, .18);
+  border-radius: 10px;
+  background: rgba(9, 15, 25, .58);
+}
+.enchant-details summary {
+  padding: 7px 9px;
+  color: var(--link);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 800;
+  list-style-position: inside;
+}
+.enchant-details summary:hover,
+.enchant-details summary:focus-visible { color: var(--accent); outline: 2px solid rgba(126, 240, 179, .3); outline-offset: -2px; }
+.enchant-detail-body { display: grid; gap: 9px; padding: 0 9px 9px; color: #c8d4e4; font-size: 10px; }
+.enchant-detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.enchant-detail-grid > div { display: grid; gap: 2px; min-width: 0; }
+.enchant-level-control label { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.enchant-level-control output { color: var(--accent); font-variant-numeric: tabular-nums; }
+.enchant-level-slider { width: 100%; accent-color: var(--accent); cursor: pointer; }
+
+@media (max-width: 520px) {
+  .relic-detail-grid { grid-template-columns: 1fr; }
+  .enchant-detail-grid { grid-template-columns: 1fr; }
+  .relic-details summary { padding: 9px 10px; }
+}
