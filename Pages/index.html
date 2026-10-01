@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark" />
     <title>ATM10 Relics / Artifacts 早見表</title>
 
-    <style>
+    <style media="not all">
       :root {
         --bg: #090c12;
         --bg-soft: #0d121a;
@@ -620,7 +620,7 @@
             <span aria-hidden="true">☰</span>
           </button>
           <div class="site-nav-links" id="site-nav-links">
-            <a href="./index.html" aria-current="page">Relics / Artifacts</a>
+            <a href="./index.html" class="active" aria-current="page">Relics / Artifacts</a>
             <a href="./enchantments.html">Enchantments</a>
           </div>
         </nav>
@@ -1661,6 +1661,7 @@
 
       const slotOrder = [
         "頭",
+        "顔",
         "背中",
         "首飾り",
         "腰",
@@ -1669,6 +1670,8 @@
         "指輪",
         "チャーム",
         "手持ち",
+        "手持ち / Shield",
+        "手持ち / Food",
         "手持ち / Utility",
       ];
 
@@ -1703,7 +1706,7 @@
           maxRank: null,
           quality: null,
           abilities: [],
-          leveling: "テンプレート情報なし",
+          leveling: "能力情報なし",
         };
 
         return {
@@ -1742,7 +1745,8 @@
       function imageCandidates(item) {
         const base =
           item.mod === "Artifacts" ? URLS.artifactImages : URLS.relicImages;
-        const imageId = IMAGE_ID_ALIASES[item.mod]?.[item.id] ?? item.id;
+        const imageId =
+          item.imageId ?? IMAGE_ID_ALIASES[item.mod]?.[item.id] ?? item.id;
 
         return {
           gif: base + imageId + ".gif",
@@ -2165,27 +2169,24 @@
       function ranksHtml(ranks) {
         if (!ranks || ranks.length === 0) {
           return (
-            `<span class="no-rank">` +
-            `固有システム / 標準Rank追加効果なし` +
-            `</span>`
+            `<p class="no-rank">追加Rank効果の記載なし</p>`
           );
         }
 
         return (
-          `<ul class="rank-list">` +
+          `<div class="rank-list">` +
           ranks
             .map(
               ([rank, effect]) =>
-                `<li>` +
+                `<div class="rank-row">` +
                 `<span class="rank-label">` +
                 escapeHtml(rank) +
                 `</span>` +
-                `：` +
                 escapeHtml(effect) +
-                `</li>`,
+                `</div>`,
             )
             .join("") +
-          `</ul>`
+          `</div>`
         );
       }
 
@@ -2202,7 +2203,6 @@
           item.name,
           item.main,
           item.xp,
-          item.leveling,
           ...item.abilities,
           ...item.ranks.flat(),
         ]
@@ -2217,59 +2217,33 @@
       }
 
       function detailHtml(item) {
-        const registry = escapeHtml(item.registry);
         const abilities = item.abilities.length
           ? item.abilities
-              .map((ability) => `<span class="ability-chip">${escapeHtml(humanizeAbility(ability))}<small>${escapeHtml(ability)}</small></span>`)
+              .map((ability) => `<span class="ability-chip">${escapeHtml(humanizeAbility(ability))}</span>`)
               .join("")
-          : `<span class="muted">テンプレート能力を確認できず</span>`;
-        const maxLevel = Number.isInteger(item.maxLevel) ? item.maxLevel : 1;
-        const levelText = Number.isInteger(item.maxLevel)
-          ? `Lv 0 / ${item.maxLevel}`
-          : "レベル上限未確認";
-        const rankText = Number.isInteger(item.maxRank)
-          ? `Rank ${item.maxRank}`
-          : "Rank 未確認";
+          : `<span class="muted">能力名を確認できず</span>`;
 
         return `
-          <details class="relic-details">
-            <summary>詳細 / 育成データ</summary>
-            <div class="relic-detail-body">
-              <div class="relic-detail-grid">
-                <div><span class="detail-label">Registry</span><code>${registry}</code></div>
-                <div><span class="detail-label">装備スロット</span><span>${escapeHtml(item.curiosSlot)}</span></div>
-                <div><span class="detail-label">由来 / 実装</span><span>${escapeHtml(item.originMod)} / ${escapeHtml(item.behaviorMod)}</span></div>
-                <div><span class="detail-label">品質・上限</span><span>Quality ${escapeHtml(item.quality ?? "—")} / ${escapeHtml(rankText)}</span></div>
-              </div>
-              <div class="detail-section">
-                <span class="detail-label">テンプレート能力</span>
-                <div class="ability-chips">${abilities}</div>
-              </div>
-              <div class="detail-section relic-level-control">
-                <label for="level-${escapeHtml(item.registry.replaceAll(":", "-"))}">
-                  <span class="detail-label">育成レベルの目安</span>
-                  <output data-level-output>${escapeHtml(levelText)}</output>
-                </label>
-                <input
-                  id="level-${escapeHtml(item.registry.replaceAll(":", "-"))}"
-                  class="relic-level-slider"
-                  type="range"
-                  min="0"
-                  max="${maxLevel}"
-                  value="0"
-                  step="1"
-                  aria-label="${escapeHtml(item.name)}の育成レベル"
-                />
-              </div>
-              <p class="detail-note">${escapeHtml(item.leveling)}</p>
-            </div>
-          </details>`;
+          <div class="relic-facts">
+            <section class="fact-group">
+              <h3>Ability</h3>
+              <div class="ability-chips">${abilities}</div>
+            </section>
+            <section class="fact-group">
+              <h3>Rank Modifiers</h3>
+              ${ranksHtml(item.ranks)}
+            </section>
+            <section class="fact-group experience-group">
+              <h3>Experience</h3>
+              <p>${escapeHtml(item.xp)}</p>
+            </section>
+          </div>`;
       }
 
       function rowHtml(item) {
         return `
-    <tr data-relic="${escapeHtml(item.registry)}">
-      <td>
+    <article class="relic-row" data-relic="${escapeHtml(item.registry)}">
+      <div class="relic-primary">
         <div class="item">
 
           <div class="icon-frame">
@@ -2312,21 +2286,10 @@
           </div>
 
         </div>
-        ${detailHtml(item)}
-      </td>
-
-      <td>
-        ${escapeHtml(item.main)}
-      </td>
-
-      <td>
-        ${ranksHtml(item.ranks)}
-      </td>
-
-      <td>
-        ${escapeHtml(item.xp)}
-      </td>
-    </tr>
+        <p class="relic-effect">${escapeHtml(item.main)}</p>
+      </div>
+      ${detailHtml(item)}
+    </article>
   `;
       }
 
@@ -2374,43 +2337,13 @@
           }
 
           html += `
-      <section class="slot-section">
-
-        <h2 class="slot-title">
-          ${escapeHtml(slot)}
-        </h2>
-
-        <div class="table-shell">
-          <div class="table-scroll">
-
-            <table>
-              <colgroup>
-                <col class="name-col">
-                <col class="effect-col">
-                <col class="rank-col">
-                <col class="xp-col">
-              </colgroup>
-
-              <thead>
-                <tr>
-                  <th>名前 / MOD</th>
-                  <th>主効果</th>
-                  <th>ランク別追加効果</th>
-                  <th>レベルアップ条件</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                ${rows.join("")}
-              </tbody>
-
-            </table>
-
-          </div>
+      <section class="slot-section" id="slot-${escapeHtml(slot)}">
+        <div class="section-heading">
+          <h2 class="slot-title">${escapeHtml(slot)}</h2>
+          <span class="section-count">${slotItems.length}件</span>
         </div>
-
-      </section>
-    `;
+        <div class="relic-list">${rows.join("")}</div>
+      </section>`;
         }
 
         if (!html) {
@@ -2424,7 +2357,7 @@
         content.innerHTML = html;
 
         if (summary) {
-          summary.textContent = `${filtered.length} / ${normalized.length} 件を表示中 — 詳細を開くとRegistry・能力・育成上限を確認できます`;
+          summary.textContent = `${filtered.length} / ${normalized.length} 件を表示中 — Ability・Rank・Experienceを一覧表示`;
         }
 
         renderVersion += 1;
@@ -2458,54 +2391,7 @@
 
       modFilter.addEventListener("change", render);
 
-      content.addEventListener("input", (event) => {
-        const slider = event.target.closest(".relic-level-slider");
-        if (!slider) return;
-
-        const output = slider.closest(".relic-level-control")?.querySelector("[data-level-output]");
-        if (!output) return;
-
-        output.textContent = `Lv ${slider.value} / ${slider.max}`;
-      });
-
       render();
-    </script>
-    <script>
-      (() => {
-        document.documentElement.classList.add("has-nav-js");
-
-        const nav = document.querySelector(".site-nav");
-        const toggle = nav?.querySelector(".site-nav-toggle");
-        const links = nav?.querySelector(".site-nav-links");
-
-        if (!nav || !toggle || !links) return;
-
-        const setOpen = (open) => {
-          toggle.setAttribute("aria-expanded", String(open));
-          toggle.setAttribute(
-            "aria-label",
-            open ? "メニューを閉じる" : "メニューを開く",
-          );
-          links.classList.toggle("is-open", open);
-        };
-
-        setOpen(false);
-        toggle.addEventListener("click", () => {
-          setOpen(toggle.getAttribute("aria-expanded") !== "true");
-        });
-        links.querySelectorAll("a").forEach((link) => {
-          link.addEventListener("click", () => setOpen(false));
-        });
-        document.addEventListener("keydown", (event) => {
-          if (event.key === "Escape") setOpen(false);
-        });
-        document.addEventListener("click", (event) => {
-          if (!nav.contains(event.target)) setOpen(false);
-        });
-
-        const media = window.matchMedia("(min-width: 701px)");
-        media.addEventListener?.("change", () => setOpen(false));
-      })();
     </script>
     <script src="./site.js"></script>
   </body>
