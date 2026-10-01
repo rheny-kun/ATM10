@@ -75,11 +75,11 @@
         <span class="registry">${esc(record.id)}</span>
         <div class="enchant-meta-line">${maxLevelTag(record)}</div>
       </td>
-      <td>${equipmentTags(record.categories)}</td>
+      <td>${equipmentTags(record.equipmentTags ?? record.categories)}</td>
       <td class="effect-cell">${esc(record.effect)}</td>
-      <td class="conflict-cell">${record.conflicts.length
+      <td class="conflict-cell"><div class="conflict-tags">${record.conflicts.length
         ? record.conflicts.map((conflict) => `<span class="conflict-tag">${esc(conflict)}</span>`).join("")
-        : '<span class="muted">—</span>'}</td>
+        : '<span class="muted">—</span>'}</div></td>
     </tr>`;
 
   const render = () => {
@@ -95,22 +95,22 @@
         record.nameEn,
         record.effect,
         record.modName,
-        ...record.categories,
+        ...(record.equipmentTags ?? record.categories),
         ...record.conflicts,
       ].join(" ").toLocaleLowerCase();
 
       return (!query || haystack.includes(query))
         && (!mod || record.modName === mod)
-        && (!category || record.categories.includes(category))
+        && (!category || (record.equipmentTags ?? record.categories).includes(category))
         && (!curse || (curse === "curse" ? record.curse : !record.curse));
     });
 
     $("rows").innerHTML = filtered.map(row).join("");
-    $("summary").textContent = `${filtered.length} / ${records.length} 件を表示中`;
+    $("summary").textContent = `${filtered.length}件`;
   };
 
   fill("modFilter", unique("modName"));
-  fill("categoryFilter", unique("categories"));
+  fill("categoryFilter", unique("equipmentTags"));
   $("search").addEventListener("input", render);
   ["modFilter", "categoryFilter", "curseFilter"].forEach((id) => {
     $(id).addEventListener("change", render);

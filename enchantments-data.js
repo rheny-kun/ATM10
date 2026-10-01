@@ -2936,6 +2936,16 @@ const EFFECT_OVERRIDES_REVIEWED = {
 };
 
 ENCHANTMENTS.forEach((record) => {
+  const equipmentTags = [...new Set(
+    (Array.isArray(record.categories) ? record.categories : [])
+      .flatMap((category) => String(category).split(/\s*\/\s*/))
+      .map((category) => category.trim())
+      .filter(Boolean),
+  )];
+
+  record.equipmentTags = equipmentTags;
+  record.categories = equipmentTags;
+
   if (Object.prototype.hasOwnProperty.call(EFFECT_OVERRIDES_REVIEWED, record.id)) {
     record.effect = EFFECT_OVERRIDES_REVIEWED[record.id];
   }

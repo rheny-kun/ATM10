@@ -4,6 +4,7 @@
   const root = document.documentElement;
   const header = document.querySelector(".site-header");
   const filterBar = document.querySelector(".filter-bar");
+  const relicTableHeader = document.querySelector(".relic-table-header");
 
   const updateStickyOffsets = () => {
     if (header) {
@@ -18,6 +19,12 @@
         `${Math.ceil(filterBar.getBoundingClientRect().height)}px`,
       );
     }
+    if (relicTableHeader) {
+      root.style.setProperty(
+        "--table-header-height",
+        `${Math.ceil(relicTableHeader.getBoundingClientRect().height)}px`,
+      );
+    }
   };
 
   updateStickyOffsets();
@@ -27,6 +34,7 @@
     const observer = new ResizeObserver(updateStickyOffsets);
     if (header) observer.observe(header);
     if (filterBar) observer.observe(filterBar);
+    if (relicTableHeader) observer.observe(relicTableHeader);
   }
 
   document.documentElement.classList.add("has-nav-js");

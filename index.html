@@ -634,11 +634,11 @@
           class="control"
           type="search"
           autocomplete="off"
-          placeholder="名前・効果・ランク・レベルアップ条件を検索…"
+          placeholder="名前・効果・ランク・経験値を検索…"
         />
 
         <select id="slotFilter" class="control">
-          <option value="">すべての部位</option>
+          <option value="">すべてのカテゴリ</option>
         </select>
 
         <select id="modFilter" class="control">
@@ -651,6 +651,12 @@
 
     <main class="container">
       <div id="summary" class="summary" aria-live="polite"></div>
+      <div class="relic-table-header" role="row" aria-label="Relics一覧の列">
+        <div>名前</div>
+        <div>主効果 / Ability</div>
+        <div>Rank</div>
+        <div>Experience</div>
+      </div>
       <div id="content"></div>
     </main>
 
@@ -1661,18 +1667,13 @@
 
       const slotOrder = [
         "頭",
-        "顔",
-        "背中",
-        "首飾り",
-        "腰",
+        "ネックレス",
+        "リング",
         "手",
-        "足",
-        "指輪",
+        "ベルト",
+        "ブーツ",
         "チャーム",
-        "手持ち",
-        "手持ち / Shield",
-        "手持ち / Food",
-        "手持ち / Utility",
+        "ツール",
       ];
 
       const search = document.getElementById("search");
@@ -2210,40 +2211,123 @@
           .toLowerCase();
       }
 
-      function humanizeAbility(id) {
-        return String(id)
-          .replaceAll("_", " ")
-          .replace(/\b\w/g, (character) => character.toUpperCase());
+      const ABILITY_LABELS = {
+        fog: "Mist Trail",
+        gaze: "Gaze",
+        spectral_escape: "Spectral Escape",
+        distortion: "Distortion",
+        illusion: "Illusion Copy",
+        glitch: "Glitch Copy",
+        camouflage: "Camouflage",
+        revival: "Leaf Revival",
+        phase: "Phase Walk",
+        invisibility: "Vanishing",
+        constellation: "Constellation",
+        starfall: "Starfall",
+        slots: "Extra Slots",
+        pack: "Pet Pack",
+        dispersion: "Relic XP Dispersion",
+        blink: "Blink Teleport",
+        rewind: "Time Rewind",
+        glass: "Liquid Glass",
+        skating: "Skating",
+        bounce: "Bounce",
+        satiety: "Satiety",
+        neutrality: "Piglin Neutrality",
+        barter: "Barter",
+        looting: "Looting Bonus",
+        regeneration: "Regeneration",
+        shock: "Chain Shock",
+        reflection: "Damage Reflection",
+        stable: "Mount Stable",
+        retaliation: "Parry / Retaliation",
+        sacrifice: "Self-Sacrifice",
+        hunger_mining: "Hunger Mining",
+        withering: "Withering",
+        antidote: "Antidote",
+        chorus: "Chorus Protection",
+        jump: "Air Jump",
+        heart: "Crystal Heart",
+        flying: "Hover Flight",
+        lava: "Lava Protection",
+        magnetism: "Magnetism",
+        warp: "Ender Warp",
+        meal: "Reusable Meal",
+        water_dash: "Water Dash",
+        swim: "Swim",
+        feline_aura: "Feline Aura",
+        nine_lives: "Nine Lives",
+        devouring: "Grass Devouring",
+        runner: "Speed Runner",
+        snow: "Snow Walker",
+        resistance: "Knockback Resistance",
+        wall_slide: "Wall Slide",
+        lava_stride: "Lava Stride",
+        digging: "Digging",
+        feral: "Feral Charge",
+        flame: "Flame Retaliation",
+        hook: "Golden Hook",
+        heating: "Auto-Smelt",
+        piston: "Reach Extension",
+        power: "Power Strike",
+        vampire: "Vampiric Healing",
+        catch: "Fishing Catch",
+        riding: "Mount Riding",
+        drinking: "Fast Drinking",
+        vision: "Night Vision",
+        snorkeling: "Snorkeling",
+        trade_surge: "Trade Surge",
+        golem_guard: "Golem Guard",
+        push: "Gas Push",
+        size: "Size Shift",
+        sinking: "Sinking / Water Breathing",
+        protection: "Protection",
+        fire: "Fire Retaliation",
+        fortune: "Fortune Bonus",
+        panic: "Panic",
+        poison: "Poison Thorn",
+        glider: "Glider",
+        shield: "Shield",
+        pride: "Pride",
+        envy: "Envy",
+        wrath: "Wrath",
+        sloth: "Sloth",
+        greed: "Greed",
+        gluttony: "Gluttony",
+        lust: "Lust",
+      };
+
+      function abilityLabel(id) {
+        return ABILITY_LABELS[id] ?? "Ability";
       }
 
       function detailHtml(item) {
         const abilities = item.abilities.length
           ? item.abilities
-              .map((ability) => `<span class="ability-chip">${escapeHtml(humanizeAbility(ability))}</span>`)
+              .map((ability) => `<span class="ability-chip">${escapeHtml(abilityLabel(ability))}</span>`)
               .join("")
-          : `<span class="muted">能力名を確認できず</span>`;
+          : '<span class="ability-chip">特殊能力</span>';
 
         return `
-          <div class="relic-facts">
-            <section class="fact-group">
-              <h3>Ability</h3>
-              <div class="ability-chips">${abilities}</div>
-            </section>
-            <section class="fact-group">
-              <h3>Rank Modifiers</h3>
-              ${ranksHtml(item.ranks)}
-            </section>
-            <section class="fact-group experience-group">
-              <h3>Experience</h3>
-              <p>${escapeHtml(item.xp)}</p>
-            </section>
+          <div class="fact-group ability-group">
+            <h3>Ability</h3>
+            <div class="ability-chips">${abilities}</div>
+            <p class="ability-description">${escapeHtml(item.main)}</p>
+          </div>
+          <div class="fact-group rank-group">
+            <h3>Rank Modifiers</h3>
+            ${ranksHtml(item.ranks)}
+          </div>
+          <div class="fact-group experience-group">
+            <h3>Experience</h3>
+            <p>${escapeHtml(item.xp)}</p>
           </div>`;
       }
 
       function rowHtml(item) {
         return `
     <article class="relic-row" data-relic="${escapeHtml(item.registry)}">
-      <div class="relic-primary">
+      <div class="relic-name-cell">
         <div class="item">
 
           <div class="icon-frame">
@@ -2286,7 +2370,6 @@
           </div>
 
         </div>
-        <p class="relic-effect">${escapeHtml(item.main)}</p>
       </div>
       ${detailHtml(item)}
     </article>
@@ -2322,7 +2405,9 @@
         const renderedItems = [];
 
         for (const slot of slotOrder) {
-          const slotItems = filtered.filter((item) => item.slot === slot);
+          const slotItems = filtered
+            .filter((item) => item.slot === slot)
+            .sort((a, b) => a.mod.localeCompare(b.mod) || a.name.localeCompare(b.name, "en"));
 
           if (!slotItems.length) {
             continue;
@@ -2340,7 +2425,6 @@
       <section class="slot-section" id="slot-${escapeHtml(slot)}">
         <div class="section-heading">
           <h2 class="slot-title">${escapeHtml(slot)}</h2>
-          <span class="section-count">${slotItems.length}件</span>
         </div>
         <div class="relic-list">${rows.join("")}</div>
       </section>`;
@@ -2357,7 +2441,7 @@
         content.innerHTML = html;
 
         if (summary) {
-          summary.textContent = `${filtered.length} / ${normalized.length} 件を表示中 — Ability・Rank・Experienceを一覧表示`;
+          summary.textContent = `${filtered.length}件`;
         }
 
         renderVersion += 1;
