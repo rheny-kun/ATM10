@@ -2206,6 +2206,7 @@
           item.main,
           item.xp,
           ...item.abilities,
+          ...item.abilities.map(abilityDetail),
           ...item.ranks.flat(),
         ]
           .join(" ")
@@ -2226,6 +2227,7 @@
         constellation: "Constellation",
         starfall: "Starfall",
         slots: "Extra Slots",
+        gliding: "Glide",
         pack: "Pet Pack",
         dispersion: "Relic XP Dispersion",
         blink: "Blink Teleport",
@@ -2298,8 +2300,100 @@
         lust: "Lust",
       };
 
+      /* Player-facing explanations for the short ability IDs above. */
+      const ABILITY_DETAILS = {
+        fog: "移動中に霧を残し、追跡してくる敵の視界や接近を妨げる。",
+        gaze: "視線を合わせた対象を起点に効果を発動し、Gaze Chargeに応じて攻撃性能が高まる。",
+        spectral_escape: "致死ダメージを受けたときに救命し、逃走や反撃のためのSpectral効果を発動する。",
+        distortion: "敵の攻撃を一定確率で外れさせる。攻撃を受けにくくする防御系の能力。",
+        illusion: "Illusion Copyを作り出し、自分の攻撃を複製して対象へ追加の圧力をかける。",
+        glitch: "Glitch Copyを残し、コピーによる攻撃や固体ブロックのPhaseを利用できる。",
+        camouflage: "葉の中で周囲に紛れ、葉ブロックを利用した隠密効果を得る。",
+        revival: "致死ダメージ時に周囲の葉を消費して生存する。",
+        phase: "固体ブロックをすり抜けるPhase移動を可能にする。",
+        invisibility: "条件を満たしている間、姿を隠す。移動や攻撃などの行動で解除される効果もある。",
+        constellation: "月相や星座の状態を参照し、時間帯や月の状態に応じた能力を強化する。",
+        starfall: "星を落として周囲を攻撃する。Rankが上がると追加対象やStunなどの効果が加わる。",
+        slots: "装備できるCharmスロットを増やし、同時に利用できるCurios系アイテムの枠を広げる。",
+        gliding: "空中でMomentumを維持しながら滑空し、落下ダメージを抑えて移動できる。",
+        pack: "Tamed Petの攻撃や生存力を強化し、ペットと一緒に戦うほど効果を活かせる。",
+        dispersion: "獲得したRelic XPの一部を、装備中の別のRelicへ分配する。",
+        blink: "視線方向の地点へ短距離Teleportする。Rankに応じて安全着地や敵のターゲット解除が加わる。",
+        rewind: "直近の移動経路や状態を巻き戻し、受けたダメージや位置を過去の状態へ戻す。",
+        glass: "保存した液体を参照し、その液体の表面を歩けるようにする。",
+        skating: "移動を続けるほど加速し、Drift中に攻撃性Sparkを発生させる。",
+        bounce: "着地時に跳ね返って再び移動できる。Bounce回数や着地方法が追加効果の条件になる。",
+        satiety: "食料やMeatballを効率よく利用し、食事による満腹度・回復効果を強化する。",
+        neutrality: "Piglinを中立化し、通常なら敵対する距離でも安全に接近しやすくする。",
+        barter: "PiglinとのBarterを強化し、まとめて処理するなど取引を効率化する。",
+        looting: "Mob撃破やアイテム取得に関係するLoot効果を強化する。",
+        regeneration: "水中や雨天などの条件で回復効果を強化し、水から出たときにも一時的な防御を得る。",
+        shock: "被弾や攻撃をきっかけに電撃を発生させ、近くの対象へ連鎖させる。",
+        reflection: "受けたダメージを反射用のOrbとして蓄積し、反撃時に敵へ撃ち返す。",
+        stable: "騎乗中のプレイヤーとMountを安定させ、騎乗時の被ダメージや扱いやすさを改善する。",
+        retaliation: "Parry Window中に正面からの攻撃を防ぎ、成功時に攻撃者へ反撃やStunを返す。",
+        sacrifice: "自分のHPや回復資源を一時的に支払い、その代わりにダメージ軽減・回復・無効化を得る。",
+        hunger_mining: "満腹度やSaturationが高いほど採掘速度を上げ、食事状態を採掘能力へ変換する。",
+        withering: "攻撃した対象へWitherを付与し、自分はWitherダメージを軽減または回復へ利用する。",
+        antidote: "自分に付与された有害なEffectの持続時間や強度を抑え、再付与への耐性も得る。",
+        chorus: "致死ダメージを防ぎ、Chorus系の効果で近くの安全な場所へTeleportする。",
+        jump: "空中で追加ジャンプを行う。Rankに応じて落下防止、上昇力、空中での再チャージが強化される。",
+        heart: "一時的な追加HP Reserveを与え、失ったReserveを時間経過で回復する。",
+        flying: "ダブルジャンプ後などに空中でHoverし、一定時間その場に近い状態で飛行できる。",
+        lava: "溶岩環境で受けるダメージや溶岩への着地ダメージを軽減する。",
+        magnetism: "近くのアイテムやXP Orbを引き寄せ、Pull / Pushの切り替えで対象の移動方向も操作する。",
+        warp: "Ender Pearlの移動を専用クールダウンで代替し、消費や着地時の不利益を抑える。",
+        meal: "チャージを使って食料を繰り返し利用でき、時間経過で再び食べられるようにする。",
+        water_dash: "水面を走り、移動を続けるほど速度を高める。Rankに応じて水上JumpやProjectile対策も加わる。",
+        swim: "水中での移動速度と滞在性能を高め、空気消費や敵の攻撃を軽減する。",
+        feline_aura: "CreeperやPhantomなど特定の敵が近づきにくくなる。",
+        nine_lives: "致死ダメージを受けたとき、一定条件下でHP1を残して生存する。",
+        devouring: "Grassを利用して満腹度やSaturationを回復し、周囲の植物へ追加効果を与える。",
+        runner: "走り続けるほど速度を蓄積し、速度に応じてStep Heightや防御面も強化する。",
+        snow: "雪上での移動を速くし、Powder Snowへの沈下や凍結を防ぐ。",
+        resistance: "ノックバックや被ダメージを抑え、攻撃を受けても位置を維持しやすくする。",
+        wall_slide: "壁面でゆっくり降下でき、Wall Slide中の被ダメージを軽減する。",
+        lava_stride: "溶岩の表面を歩き、溶岩上でのJumpや移動中の火炎ダメージ対策を強化する。",
+        digging: "採掘速度を上げ、連続採掘や素手での採掘能力を強化する。",
+        feral: "連続攻撃でChargeを蓄積し、攻撃速度や敵の無敵時間への対策を強化する。",
+        flame: "攻撃した対象を炎上させ、炎上中の対象への追加ダメージやSpark生成につなげる。",
+        hook: "XP Orbや敵を引き寄せ、Mobの手持ちアイテムを落とさせるなどHook系の効果を発動する。",
+        heating: "鉱石などのドロップを確率で自動精錬し、Rankに応じて追加Fortuneや着火効果を得る。",
+        piston: "攻撃・採掘・ブロック操作のReachを延長し、通常より遠い位置へ干渉できるようにする。",
+        power: "一定回数の攻撃をPower Strikeへ変換し、追加ダメージやShield・Armorへの対策を発動する。",
+        vampire: "与えたダメージの一部をHPとして吸収し、連続攻撃や撃破時に回復量を高める。",
+        catch: "釣りでの獲得を強化し、釣り上げたアイテムや経験値を効率よく得る。",
+        riding: "騎乗状態を強化し、Mountとの移動や操作を扱いやすくする。",
+        drinking: "食料や飲み物の使用時間を短縮し、戦闘中でも素早く利用できるようにする。",
+        vision: "暗所でも視界を確保するNight Visionを付与する。",
+        snorkeling: "水中で呼吸しやすくし、水中作業や探索を継続しやすくする。",
+        trade_surge: "Villagerとの取引を強化し、取引を効率化する。",
+        golem_guard: "Villager周辺のGolemや防衛能力に関係する保護効果を強化する。",
+        push: "衝撃やガスで対象を押し出し、敵との距離を作る。",
+        size: "Shrink / Grow / Stabilizeを切り替え、プレイヤーのサイズとそれに伴う挙動を変える。",
+        sinking: "水中へ沈みやすくし、水中での呼吸や移動を補助する。",
+        protection: "被ダメージを軽減する防御効果を得る。Rankに応じて追加の防御能力が加わる。",
+        fire: "火炎や炎上への耐性を得て、火を扱う対象へ反撃効果を発動する。",
+        fortune: "Fortune対象の採掘で追加Fortuneを発動し、失敗や周囲の鉱石によって発動率が変化する。",
+        panic: "自分を狙っているMobが多いほど移動速度や攻撃速度を高める。",
+        poison: "受けた攻撃の反射時にPoisonを付与し、毒状態の対象への戦闘力も高める。",
+        glider: "空中で滑空し、落下中の移動を飛行に近い形へ変える。",
+        shield: "Umbrellaを盾として使い、正面からの攻撃を防ぐ。",
+        pride: "高低差を利用した戦闘で発動する、Ring of the Seven Deadly Sinsの個別能力。",
+        envy: "対象との状態差を利用して発動する、Ring of the Seven Deadly Sinsの個別能力。",
+        wrath: "戦闘中の攻撃や被弾を条件に発動する、Ring of the Seven Deadly Sinsの個別能力。",
+        sloth: "移動や行動の状態を条件に発動する、Ring of the Seven Deadly Sinsの個別能力。",
+        greed: "Lootやアイテム獲得を条件に発動する、Ring of the Seven Deadly Sinsの個別能力。",
+        gluttony: "食事や満腹度を条件に発動する、Ring of the Seven Deadly Sinsの個別能力。",
+        lust: "繁殖などの生物との関わりを条件に発動する、Ring of the Seven Deadly Sinsの個別能力。",
+      };
+
       function abilityLabel(id) {
         return ABILITY_LABELS[id] ?? "Ability";
+      }
+
+      function abilityDetail(id) {
+        return ABILITY_DETAILS[id] ?? "このアビリティの効果は、装備中のアイテムとRank条件に応じて発動する。";
       }
 
       function detailHtml(item) {
@@ -2309,11 +2403,24 @@
               .join("")
           : '<span class="ability-chip">特殊能力</span>';
 
+        const abilityDetails = item.abilities.length
+          ? `<div class="ability-details" aria-label="アビリティ詳細">${item.abilities
+              .map(
+                (ability) => `
+                  <div class="ability-detail">
+                    <strong>${escapeHtml(abilityLabel(ability))}</strong>
+                    <span>${escapeHtml(abilityDetail(ability))}</span>
+                  </div>`,
+              )
+              .join("")}</div>`
+          : "";
+
         return `
           <div class="fact-group ability-group">
             <h3>Ability</h3>
             <div class="ability-chips">${abilities}</div>
             <p class="ability-description">${escapeHtml(item.main)}</p>
+            ${abilityDetails}
           </div>
           <div class="fact-group rank-group">
             <h3>Rank Modifiers</h3>
