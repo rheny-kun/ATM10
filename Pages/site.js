@@ -2,20 +2,13 @@
   "use strict";
 
   const root = document.documentElement;
-  const header = document.querySelector(".site-header");
   const filterBar = document.querySelector(".filter-bar");
   const relicTableHeader = document.querySelector(".relic-table-header");
 
   const updateStickyOffsets = () => {
-    if (header) {
-      root.style.setProperty(
-        "--site-header-height",
-        `${Math.ceil(header.getBoundingClientRect().height)}px`,
-      );
-    }
     if (filterBar) {
       root.style.setProperty(
-        "--filter-bar-height",
+        "--filter-height",
         `${Math.ceil(filterBar.getBoundingClientRect().height)}px`,
       );
     }
@@ -32,7 +25,6 @@
 
   if ("ResizeObserver" in window) {
     const observer = new ResizeObserver(updateStickyOffsets);
-    if (header) observer.observe(header);
     if (filterBar) observer.observe(filterBar);
     if (relicTableHeader) observer.observe(relicTableHeader);
   }

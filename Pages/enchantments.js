@@ -40,22 +40,32 @@
     return hash;
   };
 
+  const filterTag = (label, kind, value, className = "") =>
+    `<button type="button" class="tag filter-tag ${className}" data-filter-kind="${esc(kind)}" data-filter-value="${esc(value)}" aria-label="${esc(label)}で絞り込む" aria-pressed="false">${esc(label)}</button>`;
+
   const equipmentTags = (categories) =>
     `<div class="equipment-tags">${categories
-      .map((category) => `<span class="tag equipment-tag">${esc(category)}</span>`)
+      .map((category) => filterTag(category, "category", category, "equipment-tag"))
       .join("")}</div>`;
 
   const modTag = (modName) =>
-    `<span class="tag mod-tag" style="--mod-hue: ${modHue(modName)}">${esc(modName)}</span>`;
+    filterTag(modName, "mod", modName, "mod-tag").replace(
+      'class="tag filter-tag mod-tag"',
+      `class="tag filter-tag mod-tag" style="--mod-hue: ${modHue(modName)}"`,
+    );
 
   const statusTag = (record) => {
+    const tags = [];
+    if (record.curse) {
+      tags.push(filterTag("Curse", "curse", "curse", "status-tag status-curse"));
+    }
     if (record.availability === "inactive") {
-      return '<span class="tag status-tag status-inactive">Technical / 無効</span>';
+      tags.push(filterTag("Technical", "status", "inactive", "status-tag status-inactive"));
     }
     if (record.availability === "special") {
-      return '<span class="tag status-tag status-special">特殊候補</span>';
+      tags.push(filterTag("特殊候補", "status", "special", "status-tag status-special"));
     }
-    return "";
+    return tags.join("");
   };
 
   const maxLevelTag = (record) => {
@@ -87,6 +97,7 @@
     const mod = $("modFilter").value;
     const category = $("categoryFilter").value;
     const curse = $("curseFilter").value;
+    const status = $("statusFilter").value;
 
     const filtered = records.filter((record) => {
       const haystack = [
@@ -102,18 +113,52 @@
       return (!query || haystack.includes(query))
         && (!mod || record.modName === mod)
         && (!category || (record.equipmentTags ?? record.categories).includes(category))
-        && (!curse || (curse === "curse" ? record.curse : !record.curse));
+        && (!curse || (curse === "curse" ? record.curse : !record.curse))
+        && (!status || record.availability === status);
     });
 
     $("rows").innerHTML = filtered.map(row).join("");
-    $("summary").textContent = `${filtered.length}件`;
+    updateTagStates();
+  };
+
+  const updateTagStates = () => {
+    const values = {
+      mod: $("modFilter").value,
+      category: $("categoryFilter").value,
+      curse: $("curseFilter").value,
+      status: $("statusFilter").value,
+    };
+
+    document.querySelectorAll("#rows .filter-tag").forEach((tag) => {
+      tag.setAttribute(
+        "aria-pressed",
+        String(values[tag.dataset.filterKind] === tag.dataset.filterValue),
+      );
+    });
   };
 
   fill("modFilter", unique("modName"));
   fill("categoryFilter", unique("equipmentTags"));
   $("search").addEventListener("input", render);
-  ["modFilter", "categoryFilter", "curseFilter"].forEach((id) => {
+  ["modFilter", "categoryFilter", "curseFilter", "statusFilter"].forEach((id) => {
     $(id).addEventListener("change", render);
+  });
+
+  $("rows").addEventListener("click", (event) => {
+    const tag = event.target.closest("button[data-filter-kind]");
+    if (!tag) return;
+
+    const filterId = {
+      mod: "modFilter",
+      category: "categoryFilter",
+      curse: "curseFilter",
+      status: "statusFilter",
+    }[tag.dataset.filterKind];
+    const filter = $(filterId);
+    if (!filter) return;
+
+    filter.value = tag.dataset.filterValue;
+    render();
   });
 
   render();
