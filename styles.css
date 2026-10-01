@@ -679,6 +679,7 @@ button.tag {
 .effect-charm-tag { color: #ddcaff; border-color: rgba(210, 168, 255, 0.35); background: rgba(210, 168, 255, 0.08); }
 .effect-fact { flex-basis: 100%; color: var(--muted); font-size: 10px; line-height: 1.5; overflow-wrap: anywhere; }
 .status-tag { display: inline-flex; margin-top: 7px; padding: 3px 7px; color: #ffd2d8; border: 1px solid rgba(255, 159, 172, 0.35); border-radius: 999px; background: rgba(255, 159, 172, 0.08); font-size: 9px; font-weight: 800; }
+.status-partial { color: #ffe2a9; border-color: rgba(255, 209, 124, 0.36); background: rgba(255, 209, 124, 0.08); }
 
 @media (max-width: 1180px) {
   .effect-filters { grid-template-columns: minmax(220px, 1.6fr) repeat(4, minmax(130px, 0.78fr)); }

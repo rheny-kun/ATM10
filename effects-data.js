@@ -28,6 +28,7 @@
     charm: options.charm ?? "未確認",
     charmNote: options.charmNote ?? "ATM10 8.2の既存Charmデータで、この効果の常時付与は確認できず",
     technical: Boolean(options.technical),
+    confidence: options.confidence ?? "confirmed",
     source: options.source ?? "ATM10 8.2対象jarの登録・lang・クラス実装を照合",
   });
 
@@ -181,6 +182,19 @@
     ["undergarden:virulent_resistance", "猛毒耐性", "Virulent Resistance", "The Undergarden", "有益", "Virulenceへの免疫を与える。", { maxLevel: "I", potion: "あり", charm: "未確認" }],
   ].map(([id, ja, en, modName, category, description, options]) => createEffect(id, ja, en, modName, category, description, options));
 
-  const EFFECTS = [...vanilla, ...custom];
+  const provisionalPrefixes = [
+    "tombstone:",
+    "deeperdarker:",
+    "evilcraft:",
+    "railcraft:",
+    "twilightforest:",
+    "forbidden_arcanus:",
+    "relics:",
+  ];
+  const EFFECTS = [...vanilla, ...custom].map((record) => (
+    provisionalPrefixes.some((prefix) => record.id.startsWith(prefix))
+      ? { ...record, confidence: "partial" }
+      : record
+  ));
   window.EFFECTS = EFFECTS;
 })();

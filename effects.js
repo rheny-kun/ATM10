@@ -62,6 +62,7 @@
         <div class="name-en">${esc(record.nameEn)}</div>
         <span class="registry">${esc(record.id)}</span>
         ${record.technical ? '<span class="status-tag">通常入手不可 / technical</span>' : ""}
+        ${record.confidence === "partial" ? '<span class="status-tag status-partial">詳細未確認</span>' : ""}
       </td>
       <td>
         <div class="effect-tags">
