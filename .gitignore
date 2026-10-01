@@ -1,0 +1,10 @@
+# Local ATM10 investigation material. Keep scripts and small metadata commit-able.
+/investigation/atm10-client/
+/investigation/extracted/
+/investigation/decompiled/
+/investigation/cache/
+/investigation/reports/
+/investigation/**/*.jar
+/investigation/**/*.zip
+/investigation/**/*.class
+

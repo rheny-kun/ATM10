@@ -650,9 +650,11 @@
     </div>
 
     <main class="container">
+      <div id="summary" class="summary" aria-live="polite"></div>
       <div id="content"></div>
     </main>
 
+    <script src="./relics-data.js"></script>
     <script>
       "use strict";
 
@@ -1659,15 +1661,15 @@
 
       const slotOrder = [
         "頭",
-        "背中 / Mantle",
-        "首",
+        "背中",
+        "首飾り",
         "腰",
         "手",
-        "指輪",
         "足",
-        "Charm / Utility",
-        "手持ち / Shield",
-        "その他 / 手持ち",
+        "指輪",
+        "チャーム",
+        "手持ち",
+        "手持ち / Utility",
       ];
 
       const search = document.getElementById("search");
@@ -1677,6 +1679,8 @@
       const modFilter = document.getElementById("modFilter");
 
       const content = document.getElementById("content");
+
+      const summary = document.getElementById("summary");
 
       function escapeHtml(value) {
         return String(value)
@@ -1689,15 +1693,29 @@
 
       function toItem(raw) {
         const [slot, mod, id, name, main, ranks, xp] = raw;
+        const metadata = window.RELICS_PUBLIC?.get(mod, id, slot) ?? {
+          registry: `${mod.toLowerCase()}:${id}`,
+          originMod: mod,
+          behaviorMod: mod,
+          slotLabel: slot,
+          curiosSlot: "—",
+          maxLevel: null,
+          maxRank: null,
+          quality: null,
+          abilities: [],
+          leveling: "テンプレート情報なし",
+        };
 
         return {
-          slot,
+          rawSlot: slot,
+          slot: metadata.slotLabel,
           mod,
           id,
           name,
           main,
           ranks,
           xp,
+          ...metadata,
         };
       }
 
@@ -2174,20 +2192,83 @@
       function itemSearchText(item) {
         return [
           item.slot,
+          item.rawSlot,
+          item.curiosSlot,
           item.mod,
+          item.originMod,
+          item.behaviorMod,
+          item.registry,
           item.id,
           item.name,
           item.main,
           item.xp,
+          item.leveling,
+          ...item.abilities,
           ...item.ranks.flat(),
         ]
           .join(" ")
           .toLowerCase();
       }
 
+      function humanizeAbility(id) {
+        return String(id)
+          .replaceAll("_", " ")
+          .replace(/\b\w/g, (character) => character.toUpperCase());
+      }
+
+      function detailHtml(item) {
+        const registry = escapeHtml(item.registry);
+        const abilities = item.abilities.length
+          ? item.abilities
+              .map((ability) => `<span class="ability-chip">${escapeHtml(humanizeAbility(ability))}<small>${escapeHtml(ability)}</small></span>`)
+              .join("")
+          : `<span class="muted">テンプレート能力を確認できず</span>`;
+        const maxLevel = Number.isInteger(item.maxLevel) ? item.maxLevel : 1;
+        const levelText = Number.isInteger(item.maxLevel)
+          ? `Lv 0 / ${item.maxLevel}`
+          : "レベル上限未確認";
+        const rankText = Number.isInteger(item.maxRank)
+          ? `Rank ${item.maxRank}`
+          : "Rank 未確認";
+
+        return `
+          <details class="relic-details">
+            <summary>詳細 / 育成データ</summary>
+            <div class="relic-detail-body">
+              <div class="relic-detail-grid">
+                <div><span class="detail-label">Registry</span><code>${registry}</code></div>
+                <div><span class="detail-label">装備スロット</span><span>${escapeHtml(item.curiosSlot)}</span></div>
+                <div><span class="detail-label">由来 / 実装</span><span>${escapeHtml(item.originMod)} / ${escapeHtml(item.behaviorMod)}</span></div>
+                <div><span class="detail-label">品質・上限</span><span>Quality ${escapeHtml(item.quality ?? "—")} / ${escapeHtml(rankText)}</span></div>
+              </div>
+              <div class="detail-section">
+                <span class="detail-label">テンプレート能力</span>
+                <div class="ability-chips">${abilities}</div>
+              </div>
+              <div class="detail-section relic-level-control">
+                <label for="level-${escapeHtml(item.registry.replaceAll(":", "-"))}">
+                  <span class="detail-label">育成レベルの目安</span>
+                  <output data-level-output>${escapeHtml(levelText)}</output>
+                </label>
+                <input
+                  id="level-${escapeHtml(item.registry.replaceAll(":", "-"))}"
+                  class="relic-level-slider"
+                  type="range"
+                  min="0"
+                  max="${maxLevel}"
+                  value="0"
+                  step="1"
+                  aria-label="${escapeHtml(item.name)}の育成レベル"
+                />
+              </div>
+              <p class="detail-note">${escapeHtml(item.leveling)}</p>
+            </div>
+          </details>`;
+      }
+
       function rowHtml(item) {
         return `
-    <tr>
+    <tr data-relic="${escapeHtml(item.registry)}">
       <td>
         <div class="item">
 
@@ -2221,17 +2302,17 @@
             </a>
 
             <div class="item-id">
-              ${
-                item.mod === "Artifacts" ? "artifacts" : "relics"
-              }:${escapeHtml(item.id)}
+              ${escapeHtml(item.registry)}
             </div>
 
             <div class="tags">
               ${modTag(item.mod)}
+              <span class="tag slot-tag">${escapeHtml(item.slotLabel)}</span>
             </div>
           </div>
 
         </div>
+        ${detailHtml(item)}
       </td>
 
       <td>
@@ -2342,6 +2423,10 @@
 
         content.innerHTML = html;
 
+        if (summary) {
+          summary.textContent = `${filtered.length} / ${normalized.length} 件を表示中 — 詳細を開くとRegistry・能力・育成上限を確認できます`;
+        }
+
         renderVersion += 1;
 
         stopAllAnimations();
@@ -2372,6 +2457,16 @@
       slotFilter.addEventListener("change", render);
 
       modFilter.addEventListener("change", render);
+
+      content.addEventListener("input", (event) => {
+        const slider = event.target.closest(".relic-level-slider");
+        if (!slider) return;
+
+        const output = slider.closest(".relic-level-control")?.querySelector("[data-level-output]");
+        if (!output) return;
+
+        output.textContent = `Lv ${slider.value} / ${slider.max}`;
+      });
 
       render();
     </script>
