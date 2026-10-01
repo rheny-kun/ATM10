@@ -177,7 +177,7 @@ h1 {
 
 .filters {
   display: grid;
-  grid-template-columns: minmax(260px, 2fr) repeat(4, minmax(145px, .75fr));
+  grid-template-columns: minmax(260px, 2fr) repeat(3, minmax(145px, .75fr));
   gap: 7px;
 }
 
@@ -473,14 +473,12 @@ button.tag {
 .mod-tag { color: hsl(var(--mod-hue), 88%, 84%); border-color: hsl(var(--mod-hue), 62%, 55%); background: hsl(var(--mod-hue), 48%, 19%); }
 .level-tag { color: #c5efff; border-color: rgba(142,200,255,.36); background: rgba(142,200,255,.1); font-variant-numeric: tabular-nums; }
 .status-tag { color: #ffe3a0; border-color: rgba(244,206,123,.4); background: rgba(244,206,123,.1); }
-.status-inactive { color: var(--danger); border-color: rgba(255,159,169,.4); background: rgba(255,159,169,.09); }
-.status-curse { color: #ffb0b8; border-color: rgba(255,159,169,.4); background: rgba(255,159,169,.09); }
 .effect-cell { color: #e0e8f0 !important; line-height: 1.58; }
 .conflict-cell { color: #bcc9d8 !important; }
 .conflict-tag { color: #d8c7ff; border-color: rgba(201,175,255,.25); background: rgba(201,175,255,.07); }
 
 @media (max-width: 1180px) {
-  .filters { grid-template-columns: minmax(230px, 2fr) repeat(4, minmax(125px, .8fr)); }
+  .filters { grid-template-columns: minmax(230px, 2fr) repeat(3, minmax(125px, .8fr)); }
   :root { --relic-columns: minmax(245px, .95fr) minmax(235px, 1.2fr) minmax(210px, 1.1fr) minmax(175px, .85fr); }
 }
 

@@ -2498,7 +2498,7 @@
         const filter = document.getElementById(filterId);
         if (!filter) return;
 
-        filter.value = tag.dataset.filterValue;
+        filter.value = filter.value === tag.dataset.filterValue ? "" : tag.dataset.filterValue;
         render();
         updateTagStates();
       });
