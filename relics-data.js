@@ -102,15 +102,91 @@
 
   const registryFor = (mod, id) => {
     if (mod === "Relics") return `relics:${id}`;
-    const aliases = {
-      novelty_drinking_hat: "drinking_hat",
-      plastic_drinking_hat: "drinking_hat",
-    };
-    return `reliquified_artifacts:${aliases[id] ?? id}`;
+    // Reliquified Artifacts replaces the item implementations through a
+    // mixin, but the registry entries are still registered by Artifacts.
+    return `artifacts:${id}`;
   };
 
-  const slotFor = (mod, rawSlot) => {
+  /* Exact slot tags from the ATM10 8.2 jars.  The old page used a
+   * presentation bucket for several hand-held items, which made them look
+   * like Curios charms even when the item has no Curios slot at all. */
+  const artifactSlots = {
+    anglers_hat: ["頭", "head"],
+    cowboy_hat: ["頭", "head"],
+    novelty_drinking_hat: ["頭", "head"],
+    plastic_drinking_hat: ["頭", "head"],
+    superstitious_hat: ["頭", "head"],
+    villager_hat: ["頭", "head"],
+    night_vision_goggles: ["顔", "face"],
+    snorkel: ["顔", "face"],
+    charm_of_shrinking: ["首飾り", "necklace"],
+    charm_of_sinking: ["首飾り", "necklace"],
+    cross_necklace: ["首飾り", "necklace"],
+    flame_pendant: ["首飾り", "necklace"],
+    lucky_scarf: ["首飾り", "necklace"],
+    panic_necklace: ["首飾り", "necklace"],
+    scarf_of_invisibility: ["首飾り", "necklace"],
+    shock_pendant: ["首飾り", "necklace"],
+    thorn_pendant: ["首飾り", "necklace"],
+    antidote_vessel: ["腰", "belt"],
+    chorus_totem: ["腰", "belt"],
+    cloud_in_a_bottle: ["腰", "belt"],
+    crystal_heart: ["腰", "belt"],
+    helium_flamingo: ["腰", "belt"],
+    obsidian_skull: ["腰", "belt"],
+    universal_attractor: ["腰", "belt"],
+    warp_drive: ["腰", "belt"],
+    aqua_dashers: ["足", "feet"],
+    bunny_hoppers: ["足", "feet"],
+    flippers: ["足", "feet"],
+    kitty_slippers: ["足", "feet"],
+    rooted_boots: ["足", "feet"],
+    running_shoes: ["足", "feet"],
+    snowshoes: ["足", "feet"],
+    steadfast_spikes: ["足", "feet"],
+    strider_shoes: ["足", "feet"],
+    digging_claws: ["手", "hands"],
+    feral_claws: ["手", "hands"],
+    fire_gauntlet: ["手", "hands"],
+    golden_hook: ["手", "hands"],
+    onion_ring: ["手", "hands"],
+    pickaxe_heater: ["手", "hands"],
+    pocket_piston: ["手", "hands"],
+    power_glove: ["手", "hands"],
+    vampiric_glove: ["手", "hands"],
+    withered_bracelet: ["手", "hands"],
+    whoopee_cushion: ["手持ち / Utility", "all"],
+    everlasting_beef: ["手持ち / Food", "—"],
+    eternal_steak: ["手持ち / Food", "—"],
+    umbrella: ["手持ち / Shield", "—"],
+  };
+
+  const relicSlots = {
+    ghostly_mantle: ["背中", "back"],
+    glitchy_mantle: ["背中", "back"],
+    leafy_mantle: ["背中", "back"],
+    midnight_mantle: ["背中", "back"],
+    hunting_belt: ["腰", "belt"],
+    kinetic_belt: ["腰", "belt"],
+    experience_disperser: ["チャーム", "charm"],
+    cut_glass_boot: ["足", "feet"],
+    roller_skate: ["足", "feet"],
+    springy_boot: ["足", "feet"],
+    chef_hat: ["頭", "head"],
+    piglin_mask: ["頭", "head"],
+    jellyfish_necklace: ["首飾り", "necklace"],
+    reflective_necklace: ["首飾り", "necklace"],
+    ring_of_the_seven_deadly_sins: ["指輪", "ring"],
+    chorus_staff: ["手持ち", "—"],
+    clot_of_time: ["手持ち", "—"],
+    rider_flute: ["手持ち", "—"],
+    shield_of_retaliation: ["手持ち / Shield", "—"],
+    sphere_of_self_sacrifice: ["手持ち", "—"],
+  };
+
+  const slotFor = (mod, id, rawSlot) => {
     if (mod === "Relics") {
+      if (relicSlots[id]) return relicSlots[id];
       return {
         "背中 / Mantle": ["背中", "back"],
         "足": ["足", "feet"],
@@ -122,6 +198,8 @@
         "手持ち / Shield": ["手持ち", "curio / shield"],
       }[rawSlot] ?? [rawSlot, "—"];
     }
+
+    if (artifactSlots[id]) return artifactSlots[id];
 
     return {
       "その他 / 手持ち": ["手持ち / Utility", "—"],
@@ -141,20 +219,28 @@
     slotFor,
     get(mod, id, rawSlot) {
       const registry = registryFor(mod, id);
-      const template = templates[registry] ?? {
+      const templateId = {
+        novelty_drinking_hat: "drinking_hat",
+        plastic_drinking_hat: "drinking_hat",
+      }[id] ?? id;
+      const templateKey = mod === "Artifacts"
+        ? `reliquified_artifacts:${templateId}`
+        : registry;
+      const template = templates[registry] ?? templates[templateKey] ?? {
         maxLevel: null,
         maxRank: null,
         quality: null,
         abilities: [],
         leveling: "テンプレート情報を公開jarから確認できず。",
       };
-      const [slotLabel, curiosSlot] = slotFor(mod, rawSlot);
+      const [slotLabel, curiosSlot] = slotFor(mod, id, rawSlot);
       return {
         registry,
         originMod: mod === "Artifacts" ? "Artifacts" : "Relics",
         behaviorMod: mod === "Artifacts" ? "Reliquified Artifacts" : "Relics",
         slotLabel,
         curiosSlot,
+        imageId: mod === "Artifacts" && id === "umbrella" ? "umbrella_held" : id,
         ...template,
       };
     },

@@ -5,7 +5,7 @@
   const $ = (id) => document.getElementById(id);
 
   const esc = (value) =>
-    String(value ?? "").replace(/[&<>"']/g, (character) =>
+    String(value ?? "").replace(/[&<>\"']/g, (character) =>
       ({
         "&": "&amp;",
         "<": "&lt;",
@@ -40,9 +40,6 @@
     return hash;
   };
 
-  fill("modFilter", unique("modName"));
-  fill("categoryFilter", unique("categories"));
-
   const equipmentTags = (categories) =>
     `<div class="equipment-tags">${categories
       .map((category) => `<span class="tag equipment-tag">${esc(category)}</span>`)
@@ -51,56 +48,37 @@
   const modTag = (modName) =>
     `<span class="tag mod-tag" style="--mod-hue: ${modHue(modName)}">${esc(modName)}</span>`;
 
-  const effectText = (record) => record.effect;
-
-  const availabilityLabel = (record) => {
-    if (record.availability === "special") return "特殊入手";
-    if (record.availability === "unknown") return "入手経路はMOD依存";
-    return "通常候補";
+  const statusTag = (record) => {
+    if (record.availability === "inactive") {
+      return '<span class="tag status-tag status-inactive">Technical / 無効</span>';
+    }
+    if (record.availability === "special") {
+      return '<span class="tag status-tag status-special">特殊候補</span>';
+    }
+    return "";
   };
 
-  const detail = (record) => {
-    const maxLevel = Number.isInteger(record.maxLevel) ? record.maxLevel : 1;
-    const obtain = Array.isArray(record.obtain) && record.obtain.length
-      ? record.obtain.map(esc).join(" / ")
-      : "確認できず";
-    const supported = record.supportedItems || record.categories.join(" / ");
-
-    return `
-      <details class="enchant-details">
-        <summary>詳細 / Lvを確認</summary>
-        <div class="enchant-detail-body">
-          <div class="enchant-detail-grid">
-            <div><span class="detail-label">最大Lv</span><strong>${esc(maxLevel)}</strong></div>
-            <div><span class="detail-label">状態</span><span>${esc(availabilityLabel(record))}</span></div>
-            <div><span class="detail-label">対象タグ</span><span>${esc(supported)}</span></div>
-            <div><span class="detail-label">入手</span><span>${obtain}</span></div>
-          </div>
-          <div class="enchant-level-control">
-            <label for="enchant-level-${esc(record.id.replaceAll(":", "-"))}">
-              <span class="detail-label">効果レベルの目安</span>
-              <output data-enchant-level-output>Lv 1 / ${esc(maxLevel)}</output>
-            </label>
-            <input id="enchant-level-${esc(record.id.replaceAll(":", "-"))}" class="enchant-level-slider" type="range" min="1" max="${esc(maxLevel)}" value="1" step="1" aria-label="${esc(record.nameJa)}の効果レベル" />
-          </div>
-          <p class="detail-note">${esc(record.metadataSource || "ATM10 8.2 registry/config")}</p>
-        </div>
-      </details>`;
+  const maxLevelTag = (record) => {
+    const maxLevel = Number.isInteger(record.maxLevel) ? record.maxLevel : null;
+    return maxLevel ? `<span class="level-tag">最大Lv ${esc(maxLevel)}</span>` : "";
   };
 
   const row = (record) => `
     <tr>
-      <td>
-        <div class="name-ja">${esc(record.nameJa)}</div>
+      <td class="enchant-name-cell">
+        <div class="enchant-title-line">
+          <div class="name-ja">${esc(record.nameJa)}</div>
+          ${modTag(record.modName)}
+          ${statusTag(record)}
+        </div>
         <div class="name-en">${esc(record.nameEn)}</div>
         <span class="registry">${esc(record.id)}</span>
-        ${modTag(record.modName)}
-        ${detail(record)}
+        <div class="enchant-meta-line">${maxLevelTag(record)}</div>
       </td>
       <td>${equipmentTags(record.categories)}</td>
-      <td>${esc(effectText(record))}</td>
-      <td>${record.conflicts.length
-        ? record.conflicts.map(esc).join("<br>")
+      <td class="effect-cell">${esc(record.effect)}</td>
+      <td class="conflict-cell">${record.conflicts.length
+        ? record.conflicts.map((conflict) => `<span class="conflict-tag">${esc(conflict)}</span>`).join("")
         : '<span class="muted">—</span>'}</td>
     </tr>`;
 
@@ -131,16 +109,11 @@
     $("summary").textContent = `${filtered.length} / ${records.length} 件を表示中`;
   };
 
+  fill("modFilter", unique("modName"));
+  fill("categoryFilter", unique("categories"));
   $("search").addEventListener("input", render);
   ["modFilter", "categoryFilter", "curseFilter"].forEach((id) => {
     $(id).addEventListener("change", render);
-  });
-
-  $("rows").addEventListener("input", (event) => {
-    const slider = event.target.closest(".enchant-level-slider");
-    if (!slider) return;
-    const output = slider.closest(".enchant-level-control")?.querySelector("[data-enchant-level-output]");
-    if (output) output.textContent = `Lv ${slider.value} / ${slider.max}`;
   });
 
   render();
