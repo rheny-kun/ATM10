@@ -3,14 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ATM10 Enchantments 早見表</title>
+    <title>ATM10 Effects / Potion Effects 早見表</title>
     <link rel="stylesheet" href="./styles.css?v=effects-20261002" />
     <script src="./site.js" defer></script>
   </head>
-  <body class="enchantment-page">
+  <body class="effect-page">
     <header class="site-header">
       <div class="container">
-        <h1>ATM10 Enchantments 早見表</h1>
+        <h1>ATM10 Effects 早見表</h1>
         <p class="subtitle">All the Mods 10 8.2 / Minecraft 1.21.1 / NeoForge</p>
         <nav class="site-nav" aria-label="サイト内ナビゲーション">
           <button
@@ -24,54 +24,62 @@
           </button>
           <div class="site-nav-links" id="site-nav-links">
             <a href="./index.html">Relics / Artifacts</a>
-            <a href="./enchantments.html" class="active" aria-current="page">Enchantments</a>
-            <a href="./effects.html">Effects</a>
+            <a href="./enchantments.html">Enchantments</a>
+            <a href="./effects.html" class="active" aria-current="page">Effects</a>
           </div>
         </nav>
       </div>
     </header>
 
     <section class="filter-bar">
-      <div class="container filters">
+      <div class="container filters effect-filters">
         <input
-          id="search"
+          id="effectSearch"
           class="control"
           type="search"
-          placeholder="日本語名・英語名・ID・効果を検索…"
+          placeholder="名前・ID・効果を検索…"
           autocomplete="off"
         />
-        <select id="modFilter" class="control">
+        <select id="effectModFilter" class="control">
           <option value="">すべてのMOD</option>
         </select>
-        <select id="categoryFilter" class="control">
-          <option value="">すべての装備カテゴリ</option>
+        <select id="effectCategoryFilter" class="control">
+          <option value="">すべての分類</option>
+        </select>
+        <select id="effectCharmFilter" class="control">
+          <option value="">Charm情報すべて</option>
+        </select>
+        <select id="effectPotionFilter" class="control">
+          <option value="">ポーション情報すべて</option>
         </select>
       </div>
     </section>
 
     <main class="container">
-      <div class="table-wrap enchantment-table">
+      <div class="table-wrap effect-table">
         <table>
           <colgroup>
-            <col class="enchant-name-col" />
-            <col class="enchant-equipment-col" />
-            <col class="enchant-effect-col" />
-            <col class="enchant-conflicts-col" />
+            <col class="effect-name-col" />
+            <col class="effect-category-col" />
+            <col class="effect-description-col" />
+            <col class="effect-level-col" />
+            <col class="effect-access-col" />
           </colgroup>
           <thead>
             <tr>
               <th>名前 / MOD</th>
-              <th>対応装備</th>
+              <th>分類</th>
               <th>効果</th>
-              <th>競合</th>
+              <th>Lv / 持続</th>
+              <th>Charm / Potion</th>
             </tr>
           </thead>
-          <tbody id="rows"></tbody>
+          <tbody id="effectRows"></tbody>
         </table>
       </div>
     </main>
 
-    <script src="./enchantments-data.js"></script>
-    <script src="./enchantments.js"></script>
+    <script src="./effects-data.js"></script>
+    <script src="./effects.js"></script>
   </body>
 </html>
