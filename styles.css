@@ -502,6 +502,34 @@ button.tag {
 .ability-description { margin: 10px 0 0 !important; color: var(--text) !important; }
 .fact-group p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
 .ability-chip { padding: 3px 8px; color: #d9f8e3; border: 1px solid rgba(185, 243, 111, 0.27); border-radius: 999px; background: rgba(185, 243, 111, 0.08); font-size: 10px; }
+.ability-details {
+  display: grid;
+  gap: 7px;
+  margin-top: 13px;
+}
+
+.ability-detail {
+  display: grid;
+  gap: 3px;
+  padding: 8px 10px;
+  border-left: 2px solid rgba(185, 243, 111, 0.56);
+  border-radius: 0 10px 10px 0;
+  background: linear-gradient(90deg, rgba(185, 243, 111, 0.08), rgba(120, 229, 255, 0.025));
+}
+
+.ability-detail strong {
+  color: #e8ffd8;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.ability-detail span {
+  color: #bdd0d0;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
 .rank-list { display: grid; gap: 5px; padding: 0; }
 .rank-row { display: grid; grid-template-columns: 30px 1fr; gap: 7px; color: #cfe0df; font-size: 11px; line-height: 1.45; }
 .rank-label { color: var(--violet); font-weight: 850; font-variant-numeric: tabular-nums; }
