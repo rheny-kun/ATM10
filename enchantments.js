@@ -54,12 +54,6 @@
       `class="tag filter-tag mod-tag" style="--mod-hue: ${modHue(modName)}"`,
     );
 
-  const statusTag = (record) => {
-    return record.availability === "special"
-      ? filterTag("特殊候補", "status", "special", "status-tag status-special")
-      : "";
-  };
-
   const maxLevelTag = (record) => {
     const maxLevel = Number.isInteger(record.maxLevel) ? record.maxLevel : null;
     return maxLevel ? `<span class="level-tag">最大Lv ${esc(maxLevel)}</span>` : "";
@@ -71,7 +65,6 @@
         <div class="enchant-title-line">
           <div class="name-ja">${esc(record.nameJa)}</div>
           ${modTag(record.modName)}
-          ${statusTag(record)}
         </div>
         <div class="name-en">${esc(record.nameEn)}</div>
         <span class="registry">${esc(record.id)}</span>
@@ -88,7 +81,6 @@
     const query = $("search").value.trim().toLocaleLowerCase();
     const mod = $("modFilter").value;
     const category = $("categoryFilter").value;
-    const status = $("statusFilter").value;
 
     const filtered = records.filter((record) => {
       const haystack = [
@@ -103,8 +95,7 @@
 
       return (!query || haystack.includes(query))
         && (!mod || record.modName === mod)
-        && (!category || (record.equipmentTags ?? record.categories).includes(category))
-        && (!status || record.availability === status);
+        && (!category || (record.equipmentTags ?? record.categories).includes(category));
     });
 
     $("rows").innerHTML = filtered.map(row).join("");
@@ -115,7 +106,6 @@
     const values = {
       mod: $("modFilter").value,
       category: $("categoryFilter").value,
-      status: $("statusFilter").value,
     };
 
     document.querySelectorAll("#rows .filter-tag").forEach((tag) => {
@@ -129,7 +119,7 @@
   fill("modFilter", unique("modName"));
   fill("categoryFilter", unique("equipmentTags"));
   $("search").addEventListener("input", render);
-  ["modFilter", "categoryFilter", "statusFilter"].forEach((id) => {
+  ["modFilter", "categoryFilter"].forEach((id) => {
     $(id).addEventListener("change", render);
   });
 
@@ -140,7 +130,6 @@
     const filterId = {
       mod: "modFilter",
       category: "categoryFilter",
-      status: "statusFilter",
     }[tag.dataset.filterKind];
     const filter = $(filterId);
     if (!filter) return;
