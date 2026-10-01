@@ -55,17 +55,9 @@
     );
 
   const statusTag = (record) => {
-    const tags = [];
-    if (record.curse) {
-      tags.push(filterTag("Curse", "curse", "curse", "status-tag status-curse"));
-    }
-    if (record.availability === "inactive") {
-      tags.push(filterTag("Technical", "status", "inactive", "status-tag status-inactive"));
-    }
-    if (record.availability === "special") {
-      tags.push(filterTag("特殊候補", "status", "special", "status-tag status-special"));
-    }
-    return tags.join("");
+    return record.availability === "special"
+      ? filterTag("特殊候補", "status", "special", "status-tag status-special")
+      : "";
   };
 
   const maxLevelTag = (record) => {
@@ -96,7 +88,6 @@
     const query = $("search").value.trim().toLocaleLowerCase();
     const mod = $("modFilter").value;
     const category = $("categoryFilter").value;
-    const curse = $("curseFilter").value;
     const status = $("statusFilter").value;
 
     const filtered = records.filter((record) => {
@@ -113,7 +104,6 @@
       return (!query || haystack.includes(query))
         && (!mod || record.modName === mod)
         && (!category || (record.equipmentTags ?? record.categories).includes(category))
-        && (!curse || (curse === "curse" ? record.curse : !record.curse))
         && (!status || record.availability === status);
     });
 
@@ -125,7 +115,6 @@
     const values = {
       mod: $("modFilter").value,
       category: $("categoryFilter").value,
-      curse: $("curseFilter").value,
       status: $("statusFilter").value,
     };
 
@@ -140,7 +129,7 @@
   fill("modFilter", unique("modName"));
   fill("categoryFilter", unique("equipmentTags"));
   $("search").addEventListener("input", render);
-  ["modFilter", "categoryFilter", "curseFilter", "statusFilter"].forEach((id) => {
+  ["modFilter", "categoryFilter", "statusFilter"].forEach((id) => {
     $(id).addEventListener("change", render);
   });
 
@@ -151,13 +140,12 @@
     const filterId = {
       mod: "modFilter",
       category: "categoryFilter",
-      curse: "curseFilter",
       status: "statusFilter",
     }[tag.dataset.filterKind];
     const filter = $(filterId);
     if (!filter) return;
 
-    filter.value = tag.dataset.filterValue;
+    filter.value = filter.value === tag.dataset.filterValue ? "" : tag.dataset.filterValue;
     render();
   });
 
