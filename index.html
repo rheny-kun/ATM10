@@ -650,7 +650,6 @@
     </div>
 
     <main class="container">
-      <div id="summary" class="summary" aria-live="polite"></div>
       <div class="relic-table-header" role="row" aria-label="Relics一覧の列">
         <div>名前</div>
         <div>主効果 / Ability</div>
@@ -1684,8 +1683,6 @@
 
       const content = document.getElementById("content");
 
-      const summary = document.getElementById("summary");
-
       function escapeHtml(value) {
         return String(value)
           .replaceAll("&", "&amp;")
@@ -2161,10 +2158,14 @@
         }
       });
 
+      function filterTag(label, kind, value, className = "") {
+        return `<button type="button" class="tag filter-tag ${className}" data-filter-kind="${escapeHtml(kind)}" data-filter-value="${escapeHtml(value)}" aria-label="${escapeHtml(label)}で絞り込む" aria-pressed="false">${escapeHtml(label)}</button>`;
+      }
+
       function modTag(mod) {
         const className = mod === "Artifacts" ? "tag-artifacts" : "tag-relics";
 
-        return `<span class="tag ${className}">` + escapeHtml(mod) + `</span>`;
+        return filterTag(mod, "mod", mod, className);
       }
 
       function ranksHtml(ranks) {
@@ -2365,7 +2366,7 @@
 
             <div class="tags">
               ${modTag(item.mod)}
-              <span class="tag slot-tag">${escapeHtml(item.slotLabel)}</span>
+              ${filterTag(item.slot, "slot", item.slot, "slot-tag")}
             </div>
           </div>
 
@@ -2439,10 +2440,7 @@
         }
 
         content.innerHTML = html;
-
-        if (summary) {
-          summary.textContent = `${filtered.length}件`;
-        }
+        updateTagStates();
 
         renderVersion += 1;
 
@@ -2474,6 +2472,36 @@
       slotFilter.addEventListener("change", render);
 
       modFilter.addEventListener("change", render);
+
+      function updateTagStates() {
+        const values = {
+          mod: modFilter.value,
+          slot: slotFilter.value,
+        };
+
+        content.querySelectorAll("button[data-filter-kind]").forEach((tag) => {
+          tag.setAttribute(
+            "aria-pressed",
+            String(values[tag.dataset.filterKind] === tag.dataset.filterValue),
+          );
+        });
+      }
+
+      content.addEventListener("click", (event) => {
+        const tag = event.target.closest("button[data-filter-kind]");
+        if (!tag) return;
+
+        const filterId = {
+          mod: "modFilter",
+          slot: "slotFilter",
+        }[tag.dataset.filterKind];
+        const filter = document.getElementById(filterId);
+        if (!filter) return;
+
+        filter.value = tag.dataset.filterValue;
+        render();
+        updateTagStates();
+      });
 
       render();
     </script>
